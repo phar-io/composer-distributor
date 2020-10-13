@@ -17,7 +17,7 @@ this base-code and distribute your PHAR file via composer.
 Create your own Composer-Plugin via
 
 ```bash
-composer create-project org_heigl/phar-plugin-base /path/to/your/directory/
+composer create-project org_heigl/single-phar-plugin /path/to/your/directory/
 ```
 
 Then you can replace the placeholders within `src/Plugin.php` as well as in the

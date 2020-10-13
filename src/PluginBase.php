@@ -21,9 +21,9 @@ use SplFileInfo;
 
 abstract class PluginBase implements PluginInterface, EventSubscriberInterface
 {
-	private $composer;
+	protected $composer;
 
-	private $io;
+	protected $io;
 
 	public function activate(Composer $composer, IOInterface $io)
 	{
