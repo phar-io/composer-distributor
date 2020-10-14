@@ -49,6 +49,7 @@ final class Installer
 		try {
 			$packageVersion = PackageVersion::fromPackageEvent($this->event, $this->name);
 		} catch (SomebodyElsesProblem $e) {
+			$this->io->write($e->getMessage());
 			return;
 		}
 		$versionReplacer = new VersionConstraintReplacer($packageVersion);
