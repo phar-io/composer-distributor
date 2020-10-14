@@ -61,7 +61,7 @@ final class Installer
 		)));
 
 		/** @var File $file */
-		foreach ($filelist as $file) {
+		foreach ($filelist->getList() as $file) {
 			$this->io->write(sprintf(
 				'downloading Artifact in version %2$s from %1$s',
 				$versionReplacer->replace($file->pharUrl()->toString()),
