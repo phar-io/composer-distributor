@@ -56,7 +56,7 @@ final class Installer
 
 		$factory = new Factory();
 
-		$verify = new Verify($this->keys, $factory->createGnuPG(new Directory(getcwd())));
+		$verify = new Verify($this->keys, $factory->createGnuPG(new Directory(sys_get_temp_dir())));
 
 
 		/** @var File $file */
