@@ -47,8 +47,8 @@ final class Verify
 	public function fileWithSignature(SplFileInfo $file, SplFileInfo $signature) : bool
 	{
 		$result = $this->gpg->verify(
+			file_get_contents($file->getPathname()),
 			file_get_contents($signature->getPathname()),
-			file_get_contents($file->getPathname())
 		);
 
 		if (false === $result) {
