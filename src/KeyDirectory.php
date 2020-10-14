@@ -25,8 +25,9 @@ final class KeyDirectory implements Iterator
 	{
 		$this->keys = [];
 
+
 		if (!$publicKeyFolder->isDir()) {
-			$this->keys = $publicKeyFolder;
+			$this->keys[] = $publicKeyFolder;
 			return;
 		}
 
@@ -35,7 +36,7 @@ final class KeyDirectory implements Iterator
 				continue;
 			}
 
-			$this->keys[] = $item;
+			$this->keys[] = new SplFileInfo($item->getPathname());
 		}
 	}
 

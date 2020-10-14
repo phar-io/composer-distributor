@@ -14,28 +14,29 @@ use GnuPG;
 use PharIo\SinglePharPluginBase\KeyDirectory;
 use SplFileInfo;
 use function array_filter;
+use function count;
 use function file_get_contents;
 use function sprintf;
 
 final class Verify
 {
-	/** @var SplFileInfo[] */
-	private $keys;
-
 	/** @var Gnupg */
 	private $gpg;
 
 	public function __construct(KeyDirectory $keys, GnuPG $gpg)
 	{
-		$this->keys = $keys;
 		$this->gpg = $gpg;
-		foreach ($this->keys as $key) {
-			$result[] = $this->gpg->import($key);
+		$result = [];
+
+		foreach ($keys->getList() as $key) {
+			$result[] = $this->gpg->import($key->getPathname());
 		}
 
-		if (0 >= count(array_filter($result, function ($item) {
-				return !($item['imported'] === 0 && !isset($item['fingerprint']));
-			}))) {
+		$array = array_filter($result, function ($item) {
+			return ($item['imported'] !== 0 || isset($item['fingerprint']));
+		});
+
+		if (0 >= count($array)) {
 			// when imported is 0 but fingerprint is available the key are already imported/exist
 			throw new \RuntimeException('Could not import needed GPG key!');
 		}
@@ -55,5 +56,7 @@ final class Verify
 				$file->getFilename()
 			));
 		}
+
+		return true;
 	}
 }
