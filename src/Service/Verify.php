@@ -29,7 +29,9 @@ final class Verify
 		$result = [];
 
 		foreach ($keys->getList() as $key) {
-			$result[] = $this->gpg->import($key->getPathname());
+			$result[] = $this->gpg->import(
+				file_get_contents($key->getPathname())
+			);
 		}
 
 		$array = array_filter($result, function ($item) {
