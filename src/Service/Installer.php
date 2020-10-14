@@ -70,7 +70,10 @@ final class Installer
 			$download = new Download(Url::fromString(
 				$versionReplacer->replace($file->pharUrl()->toString())
 			));
-			$pharLocation = new SplFileInfo(sys_get_temp_dir() . '/' . $file->pharName());
+			$binDir = $this->event->getComposer()->getConfig()->get('bin-dir');
+			$pharLocation = new SplFileInfo(
+				$binDir . DIRECTORY_SEPARATOR . $file->pharName()
+			);
 			$download->toLocation($pharLocation);
 
 			if (!$file->signatureUrl()) {
