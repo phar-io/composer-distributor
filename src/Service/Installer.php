@@ -22,6 +22,7 @@ use PharIo\SinglePharPluginBase\PackageVersion;
 use PharIo\SinglePharPluginBase\Url;
 use RuntimeException;
 use SplFileInfo;
+use function chmod;
 use function file_exists;
 use function mkdir;
 use function sprintf;
@@ -81,6 +82,8 @@ final class Installer
 				$binDir . DIRECTORY_SEPARATOR . $file->pharName()
 			);
 			$download->toLocation($pharLocation);
+
+			chmod($pharLocation, 0755);
 
 			if (!$file->signatureUrl()) {
 				$this->io->write(sprintf(
