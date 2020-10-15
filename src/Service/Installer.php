@@ -22,9 +22,11 @@ use PharIo\SinglePharPluginBase\PackageVersion;
 use PharIo\SinglePharPluginBase\Url;
 use RuntimeException;
 use SplFileInfo;
-use function getcwd;
+use function file_exists;
+use function mkdir;
 use function sprintf;
 use function sys_get_temp_dir;
+use const DIRECTORY_SEPARATOR;
 
 final class Installer
 {
@@ -60,6 +62,11 @@ final class Installer
 			sys_get_temp_dir()
 		)));
 
+		$binDir = $this->event->getComposer()->getConfig()->get('bin-dir');
+		if (! file_exists($binDir)) {
+			mkdir($binDir, 0777, true);
+		}
+
 		/** @var File $file */
 		foreach ($filelist->getList() as $file) {
 			$this->io->write(sprintf(
@@ -70,7 +77,6 @@ final class Installer
 			$download = new Download(Url::fromString(
 				$versionReplacer->replace($file->pharUrl()->toString())
 			));
-			$binDir = $this->event->getComposer()->getConfig()->get('bin-dir');
 			$pharLocation = new SplFileInfo(
 				$binDir . DIRECTORY_SEPARATOR . $file->pharName()
 			);
