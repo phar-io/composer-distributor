@@ -83,7 +83,7 @@ final class Installer
 			);
 			$download->toLocation($pharLocation);
 
-			chmod($pharLocation, 0755);
+			chmod($pharLocation->getRealPath(), 0755);
 
 			if (!$file->signatureUrl()) {
 				$this->io->write(sprintf(
