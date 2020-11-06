@@ -1,6 +1,6 @@
-# Single PHAR Plugin Base
+# Composer-Distributor
 
-The base-code to create a ComposerPlugin that installs a single PHAR file
+The base-code to create a ComposerPlugin that installs PHAR files
 instead of the whole source code of a project.
 
 You have a tool that behaves like a binary? A tool that can be distributed as
@@ -17,7 +17,7 @@ this base-code and distribute your PHAR file via composer.
 Create your own Composer-Plugin via
 
 ```bash
-composer create-project phario/mediator /path/to/your/directory/
+composer create-project phar-io/mediator /path/to/your/directory/
 ```
 
 Then you can replace the placeholders within `src/Plugin.php` as well as in the
