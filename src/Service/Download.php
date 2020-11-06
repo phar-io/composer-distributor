@@ -1,16 +1,15 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * Copyright Andreas Heigl <andreas@heigl.org>
+ * Copyright by the ComposerDistributor-Team
  *
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBase\Service;
+declare(strict_types=1);
 
-use PharIo\SinglePharPluginBase\Url;
+namespace PharIo\ComposerDistributor\Service;
+
+use PharIo\ComposerDistributor\Url;
 use SplFileInfo;
 use function feof;
 use function fwrite;

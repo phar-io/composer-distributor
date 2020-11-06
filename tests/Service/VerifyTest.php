@@ -1,19 +1,18 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * Copyright Andreas Heigl <andreas@heigl.org>
+ * Copyright by the ComposerDistributor-Team
  *
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBaseTest\Service;
+declare(strict_types=1);
+
+namespace PharIo\ComposerDistributorTest\Service;
 
 use Exception;
 use GnuPG;
-use PharIo\SinglePharPluginBase\KeyDirectory;
-use PharIo\SinglePharPluginBase\Service\Verify;
+use PharIo\ComposerDistributor\KeyDirectory;
+use PharIo\ComposerDistributor\Service\Verify;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use SplFileInfo;
@@ -28,12 +27,12 @@ class VerifyTest extends TestCase
 	}
 
 	/**
-	 * @covers \PharIo\SinglePharPluginBase\Service\Verify::__construct
+	 * @covers \PharIo\ComposerDistributor\Service\Verify::__construct
 	 */
 	public function testThatConstructorThrowsWithoutKeys(): void
 	{
 		$keys = new KeyDirectory(new SplFileInfo(
-			__DIR__ . '/_assets/emptKeyDirectory'
+			__DIR__ . '/_assets/emptyKeyDirectory'
 		));
 
 		$gpg = self::getMockBuilder(GnuPG::class)
@@ -48,7 +47,7 @@ class VerifyTest extends TestCase
 	}
 
 	/**
-	 * @covers \PharIo\SinglePharPluginBase\Service\Verify::__construct
+	 * @covers \PharIo\ComposerDistributor\Service\Verify::__construct
 	 */
 	public function testThatConstructorWorksWithSingleKey(): void
 	{
@@ -66,7 +65,7 @@ class VerifyTest extends TestCase
 	}
 
 	/**
-	 * @covers \PharIo\SinglePharPluginBase\Service\Verify::__construct
+	 * @covers \PharIo\ComposerDistributor\Service\Verify::__construct
 	 */
 	public function testThatConstructorWorksWithAlreadyImportedKey(): void
 	{
@@ -85,7 +84,7 @@ class VerifyTest extends TestCase
 	}
 
 	/**
-	 * @covers \PharIo\SinglePharPluginBase\Service\Verify::fileWithSignature
+	 * @covers \PharIo\ComposerDistributor\Service\Verify::fileWithSignature
 	 */
 	public function testThatCorrectVerificationWillNotThrowAnException(): void
 	{

@@ -1,14 +1,13 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * Copyright Andreas Heigl <andreas@heigl.org>
+ * Copyright by the ComposerDistributor-Team
  *
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBase;
+declare(strict_types=1);
+
+namespace PharIo\ComposerDistributor;
 
 use Iterator;
 

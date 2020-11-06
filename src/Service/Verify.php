@@ -1,17 +1,16 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * Copyright Andreas Heigl <andreas@heigl.org>
+ * Copyright by the ComposerDistributor-Team
  *
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBase\Service;
+declare(strict_types=1);
+
+namespace PharIo\ComposerDistributor\Service;
 
 use GnuPG;
-use PharIo\SinglePharPluginBase\KeyDirectory;
+use PharIo\ComposerDistributor\KeyDirectory;
 use SplFileInfo;
 use function array_filter;
 use function count;

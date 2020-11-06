@@ -1,25 +1,24 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * Copyright Andreas Heigl <andreas@heigl.org>
+ * Copyright by the ComposerDistributor-Team
  *
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBase\Service;
+declare(strict_types=1);
+
+namespace PharIo\ComposerDistributor\Service;
 
 use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
 use PharIo\FileSystem\Directory;
 use PharIo\GnuPG\Factory;
-use PharIo\SinglePharPluginBase\Exception\SomebodyElsesProblem;
-use PharIo\SinglePharPluginBase\File;
-use PharIo\SinglePharPluginBase\FileList;
-use PharIo\SinglePharPluginBase\KeyDirectory;
-use PharIo\SinglePharPluginBase\PackageVersion;
-use PharIo\SinglePharPluginBase\Url;
+use PharIo\ComposerDistributor\SomebodyElsesProblem;
+use PharIo\ComposerDistributor\File;
+use PharIo\ComposerDistributor\FileList;
+use PharIo\ComposerDistributor\KeyDirectory;
+use PharIo\ComposerDistributor\PackageVersion;
+use PharIo\ComposerDistributor\Url;
 use RuntimeException;
 use SplFileInfo;
 use function chmod;

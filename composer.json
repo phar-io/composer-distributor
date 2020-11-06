@@ -1,6 +1,6 @@
 {
-	"name": "phar-io/single-phar-plugin-base",
-	"description": "Base Code for a composer plugin that installs a single PHAR-file",
+	"name": "phar-io/composer-distributor",
+	"description": "Base Code for a composer plugin that installs PHAR-files",
 	"type": "library",
 	"license": "MIT",
 	"authors": [
@@ -10,14 +10,23 @@
 			"role": "Developer"
 		}
 	],
+	"keywords": ["phar","composer","binary","bin","distribute","phive"],
+	"homepage": "https://phar.io",
+	"support": {
+		"issues": "https://github.com/phar-io/composer-distributor/issues"
+	},
+	"funding": [{
+		"type": "other",
+		"url": "https://phar.io"
+	}],
 	"autoload": {
 		"psr-4": {
-			"PharIo\\SinglePharPluginBase\\": "src/"
+			"PharIo\\ComposerDistributor\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"PharIo\\SinglePharPluginBaseTest\\": "tests/"
+			"PharIo\\ComposerDistributorTest\\": "tests/"
 		}
 	},
 	"require": {

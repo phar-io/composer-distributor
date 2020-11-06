@@ -1,15 +1,15 @@
 <?php
 /**
- * Copyright Andreas Heigl <andreas@heigl.org>
+ * Copyright by the ComposerDistributor-Team
  *
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBaseTest;
+namespace PharIo\ComposerDistributorTest;
 
 use Generator;
-use PharIo\SinglePharPluginBase\Exception\NoSemanticVersioning;
-use PharIo\SinglePharPluginBase\SemanticVersion;
+use PharIo\ComposerDistributor\NoSemanticVersioning;
+use PharIo\ComposerDistributor\SemanticVersion;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ class SemanticVersionTest extends TestCase
 	 * @param string $build
 	 *
 	 * @dataProvider semVerIsCorrectlySplitUpProvider
-	 * @covers       \PharIo\SinglePharPluginBase\SemanticVersion::fromVersionString
+	 * @covers       \PharIo\ComposerDistributor\SemanticVersion::fromVersionString
 	 */
 	public function testThatSemVerIsCorrectlySplitUp(
 		string $version,
@@ -61,7 +61,7 @@ class SemanticVersionTest extends TestCase
 	 * @param string $build
 	 *
 	 * @dataProvider exceptionIsThrownOnIncorrectSemVerProvider
-	 * @covers       \Phive\ComposerPharMetaPlugin\SemanticVersion::fromVersionString
+	 * @covers       \PharIo\ComposerDistributor\SemanticVersion::fromVersionString
 	 */
 	public function testExceptionIsThrownOnIncorrectSemVer(string $version)
 	{

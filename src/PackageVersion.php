@@ -1,4 +1,9 @@
 <?php
+/**
+ * Copyright by the ComposerDistributor-Team
+ *
+ * Licenses under the MIT-license. For details see the included file LICENSE.md
+ */
 
 declare(strict_types=1);
 
@@ -8,14 +13,12 @@ declare(strict_types=1);
  * Licenses under the MIT-license. For details see the included file LICENSE.md
  */
 
-namespace PharIo\SinglePharPluginBase;
+namespace PharIo\ComposerDistributor;
 
 use Composer\DependencyResolver\GenericRule;
 use Composer\Installer\PackageEvent;
 use Composer\Package\CompletePackage;
 use Composer\Semver\Constraint\MultiConstraint;
-use Composer\Semver\Semver;
-use PharIo\SinglePharPluginBase\Exception\SomebodyElsesProblem;
 use Throwable;
 
 final class PackageVersion
