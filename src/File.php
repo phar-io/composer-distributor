@@ -38,6 +38,4 @@ final class File
 	{
 		return $this->signatureLocation;
 	}
-
-
 }
