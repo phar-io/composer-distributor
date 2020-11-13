@@ -34,7 +34,7 @@ final class PackageVersion
 		$this->name = $name;
 		$this->versionString = $versionString;
 		try {
-			$this->semver = SemanticVersion::fromVersionString();
+			$this->semver = SemanticVersion::fromVersionString($versionString);
 		} catch (Throwable $e) {
 			$this->semver = null;
 		}
