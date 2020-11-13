@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace PharIo\ComposerDistributor;
 
 use Composer\Installer\PackageEvent;
-use PharIo\ComposerDistributor\Config;
+use PharIo\ComposerDistributor\Config\Config;
+use PharIo\ComposerDistributor\Config\Loader;
+use PharIo\ComposerDistributor\Service\Installer;
 
 abstract class ConfiguredMediator extends PluginBase
 {
@@ -13,13 +15,19 @@ abstract class ConfiguredMediator extends PluginBase
 
 	public function installOrUpdateFunction(PackageEvent $event): void
 	{
-		$config    = Config\Loader::loadFile($this->getMediatorConfig());
-		$installer = $this->createInstaller(
-			$config->package(),
-			$config->keyDirectory(),
-			$event
-		);
+		$config    = Loader::loadFile($this->getMediatorConfig());
+		$installer = $this->createInstallerFromConfig($config, $event);
 
 		$installer->install($config->phars());
+	}
+
+	private function createInstallerFromConfig(Config $config, PackageEvent $event): Installer
+	{
+		return new Installer(
+			$config->package(),
+			$config->keyDirectory() ? new KeyDirectory($config->keyDirectory()) : null,
+			$this->io,
+			$event
+		);
 	}
 }

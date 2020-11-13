@@ -7,6 +7,8 @@ class Loader
 	/**
 	 * Config json example:
 	 *
+	 * "keyDirectory" and "signature" are optional
+	 *
 	 * {
 	 *   "packageName": "phar-io/phive",
 	 *   "keyDirectory: "keys",

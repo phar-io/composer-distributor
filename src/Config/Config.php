@@ -11,17 +11,20 @@ class Config
 	/** @var string */
 	private $package;
 
-	/** @var string */
+	/** @var \SplFileInfo|null */
 	private $keyDirectory;
 
 	/** @var \PharIo\ComposerDistributor\FileList */
 	private $phars;
 
-	public function __construct(string $package, string $keyDir, FileList $phars)
+	public function __construct(string $package, FileList $phars, ?\SplFileInfo $keyDir = null)
 	{
+		if (strpos($package, '/') === false) {
+			throw new \RuntimeException('Invalid package name');
+		}
 		$this->package      = $package;
-		$this->keyDirectory = $keyDir;
 		$this->phars        = $phars;
+		$this->keyDirectory = $keyDir;
 	}
 
 	public function package(): string
@@ -29,7 +32,7 @@ class Config
 		return $this->package;
 	}
 
-	public function keyDirectory(): string
+	public function keyDirectory(): ?\SplFileInfo
 	{
 		return $this->keyDirectory;
 	}

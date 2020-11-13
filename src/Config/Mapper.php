@@ -13,6 +13,8 @@ class Mapper
 	/**
 	 * Expected format:
 	 *
+	 * 'keyDirectory' and 'signature' are optional
+	 *
 	 * [
 	 *   'packageName'  => 'phar-io/phive',
 	 *   'keyDirectory' => 'keys',
@@ -31,7 +33,18 @@ class Mapper
 		$this->validateBaseConfig($configData);
 		$this->validatePharsConfig($configData);
 
-		return new Config($configData['package'], $configData['keyDir'], $this->createPhars($configData['phars']));
+		return new Config(
+			$configData['package'],
+			$this->createPhars($configData['phars']),
+			$this->createKeyDir($configData)
+		);
+	}
+
+	private function createKeyDir(array $configData): ?\SplFileInfo
+	{
+		return isset($configData['keyDirectory'])
+			? new \SplFileInfo($configData['keyDirectory'])
+			: null;
 	}
 
 	private function createPhars(array $pharsData): FileList
@@ -41,7 +54,7 @@ class Mapper
 			$phars[] = new File(
 				$phar['name'],
 				Url::fromString($phar['file']),
-				Url::fromString($phar['signature'])
+				!empty($phar['signature']) ? Url::fromString($phar['signature']) : null
 			);
 		}
 		return new FileList(...$phars);
@@ -51,6 +64,9 @@ class Mapper
 	{
 		if (!isset($configData['packageName']) || !is_string($configData['packageName'])) {
 			throw new \RuntimeException('Config value for  \'packageName\' is missing');
+		}
+		if (isset($configData['keyDirectory']) && !is_string($configData['keyDirectory'])) {
+			throw new \RuntimeException('Invalid \'keyDirectory\'');
 		}
 	}
 
@@ -66,14 +82,14 @@ class Mapper
 
 	private function validatePharConfig(array $pharData): void
 	{
-		if (!isset($pharData['name']) || !is_string($pharData['name'])) {
+		if (!isset($pharData['name']) || !is_string($pharData['name']) || empty($pharData['name'])) {
 			throw new \RuntimeException('Invalid phar config  \'name\' is missing');
 		}
-		if (!isset($pharData['file']) || !is_string($pharData['file'])) {
+		if (!isset($pharData['file']) || !is_string($pharData['file']) || empty($pharData['file'])) {
 			throw new \RuntimeException('Invalid phar config  \'file\' is missing');
 		}
-		if (!isset($pharData['signature']) || !is_string($pharData['signature'])) {
-			throw new \RuntimeException('Invalid phar config  \'signature\' is missing');
+		if (isset($pharData['signature']) && !is_string($pharData['signature'])) {
+			throw new \RuntimeException('Invalid \'signature\'');
 		}
 	}
 }
