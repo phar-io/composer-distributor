@@ -34,7 +34,7 @@ class Mapper
 		$this->validatePharsConfig($configData);
 
 		return new Config(
-			$configData['package'],
+			$configData['packageName'],
 			$this->createPhars($configData['phars']),
 			$this->createKeyDir($configData)
 		);
