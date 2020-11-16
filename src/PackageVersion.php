@@ -25,7 +25,6 @@ use Composer\Package\CompletePackage;
 use Composer\Semver\Constraint\MultiConstraint;
 use RuntimeException;
 use Throwable;
-use function var_dump;
 use function version_compare;
 
 final class PackageVersion

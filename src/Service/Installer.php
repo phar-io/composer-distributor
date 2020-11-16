@@ -78,8 +78,8 @@ final class Installer
 			}
 
 			$signatureLocation = $this->downloadSignature($versionReplacer, $file);
-
 			$this->verifyPharWithSignature($pharLocation, $signatureLocation);
+			unlink($signatureLocation->getPathname());
 		}
 	}
 
@@ -123,6 +123,7 @@ final class Installer
 			$this->keys,
 			$factory->createGnuPG(new Directory(sys_get_temp_dir()))
 		);
+
 		if (!$verify->fileWithSignature($pharLocation, $signatureLocation)) {
 			throw new RuntimeException('Signature Verification failed');
 		}

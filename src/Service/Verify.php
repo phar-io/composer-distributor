@@ -50,12 +50,16 @@ final class Verify
 			file_get_contents($signature->getPathname()),
 		);
 
-		if (false === $result) {
-			throw new \RuntimeException(sprintf(
-				'Verification between "%s" and "%s" failed!',
-				$signature->getFilename(),
-				$file->getFilename()
-			));
+		switch (true) {
+			case false === $result:
+			case $result[0]['summary'] !== 0:
+				throw new \RuntimeException(sprintf(
+					'Verification between "%s" and "%s" failed!',
+					$signature->getFilename(),
+					$file->getFilename()
+				));
+				break;
+			default:
 		}
 
 		return true;

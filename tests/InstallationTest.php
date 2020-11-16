@@ -6,17 +6,17 @@ namespace PharIo\ComposerDistributorTest;
 
 use Composer\Composer;
 use Composer\Config;
-use Composer\DependencyResolver\GenericRule;
 use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\OperationInterface;
-use Composer\DependencyResolver\Rule;
 use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
 use Composer\Package\Package;
 use Exception;
 use PharIo\ComposerDistributor\ConfiguredMediator;
 use PHPUnit\Framework\TestCase;
+use function file_exists;
+use function sys_get_temp_dir;
 use function unlink;
+use function var_dump;
 
 class InstallationTest extends TestCase
 {
@@ -117,5 +117,18 @@ class InstallationTest extends TestCase
 		$class->installOrUpdateFunction($packageEvent);
 
 		unlink(__DIR__ . '/_assets/foo');
+	}
+
+	public function setUp() : void
+	{
+		parent::setUp();
+
+		if (file_exists(sys_get_temp_dir() . '/trustdb.gpg')) {
+			unlink(sys_get_temp_dir() . '/trustdb.gpg');
+		}
+
+		if (file_exists(sys_get_temp_dir() . '/pubring.kbx')) {
+			unlink(sys_get_temp_dir() . '/pubring.kbx');
+		}
 	}
 }

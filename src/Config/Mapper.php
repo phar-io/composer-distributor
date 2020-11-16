@@ -57,6 +57,7 @@ class Mapper
 				!empty($phar['signature']) ? Url::fromString($phar['signature']) : null
 			);
 		}
+
 		return new FileList(...$phars);
 	}
 
