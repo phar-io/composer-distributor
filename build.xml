@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ComposerDistributor" default="build" basedir=".">
+
+	<target name="setup" depends="clean,composer,install-tools"/>
+	<target name="build" depends="setup,lint,test"/>
+
+	<target name="clean" unless="clean.done" description="Clean up and create artifact directories">
+		<delete dir="${basedir}/build/docs"/>
+		<delete dir="${basedir}/build/coverage"/>
+		<delete dir="${basedir}/build/logs"/>
+
+		<mkdir dir="${basedir}/build/docs"/>
+		<mkdir dir="${basedir}/build/coverage"/>
+		<mkdir dir="${basedir}/build/logs"/>
+
+		<property name="clean.done" value="true"/>
+	</target>
+
+	<target name="lint">
+		<apply executable="php" failonerror="true">
+			<arg value="-l" />
+
+			<fileset dir="${basedir}/src">
+				<include name="**/*.php" />
+				<modified />
+			</fileset>
+
+			<fileset dir="${basedir}/tests/unit">
+				<include name="**/*.php" />
+				<modified />
+			</fileset>
+		</apply>
+	</target>
+
+
+	<target name="getphive" description="Get phive on travis-ci">
+		<exec executable="wget" taskname="wget">
+			<arg value="https://phar.io/releases/phive.phar"/>
+		</exec>
+		<exec executable="wget" taskname="wget">
+			<arg value="https://phar.io/releases/phive.phar.asc"/>
+		</exec>
+		<exec executable="gpg" taskname="gpg-get-key">
+			<arg line="--keyserver hkps.pool.sks-keyservers.net --recv-keys 0x9D8A98B29B2D5D79" />
+		</exec>
+		<exec executable="gpg" taskname="gpg-verify">
+			<arg line="--verify phive.phar.asc phive.phar" />
+		</exec>
+		<chmod file="phive.phar" perm="+x" />
+		<delete file="phive.phar.asc" />
+	</target>
+
+
+	<target name="prepare" unless="prepare.done" depends="clean" description="Prepare for build">
+		<property name="prepare.done" value="true"/>
+	</target>
+
+	<target name="-tools-installed">
+		<available file="${basedir}/tools/phpunit" property="tools-installed" type="file"/>
+	</target>
+
+	<target name="install-tools" unless="tools-installed" depends="-tools-installed" description="Install tools with Phive">
+		<exec executable="${phive.bin}" taskname="phive">
+			<arg value="install"/>
+			<arg value="--copy" />
+			<arg value="--trust-gpg-keys" />
+			<!--        phpunit,         psaml,           php-cs-fixer     -->
+			<arg value="2A8299CE842DD38C,8A03EA3B385DBAA1,E82B2FB314E9906E" />
+		</exec>
+	</target>
+
+	<target name="test" depends="install-tools" description="Run tests">
+		<exec executable="${basedir}/tools/phpunit" taskname="phpunit"/>
+	</target>
+
+	<target name="composer" description="Install composer dependencies (including dev)">
+		<exec executable="composer">
+			<arg value="install"/>
+		</exec>
+	</target>
+
+	<target name="composer-no-dev" description="Install composer dependencies (without dev)">
+		<exec executable="composer">
+			<arg value="install"/>
+			<arg value="--no-dev"/>
+		</exec>
+	</target>
+
+	<target name="php-cs-fixer" depends="install-tools" description="Dry run php csfixer">
+		<exec executable="./tools/php-cs-fixer" failonerror="true">
+			<arg value="fix" />
+			<arg value="--dry-run" />
+		</exec>
+	</target>
+
+</project>
