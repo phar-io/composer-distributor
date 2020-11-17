@@ -30,23 +30,27 @@ use const DIRECTORY_SEPARATOR;
 
 final class Installer
 {
+	/** @var \Composer\IO\IOInterface */
 	private $io;
 
+	/** @var string  */
 	private $name;
 
+	/** @var \PharIo\ComposerDistributor\KeyDirectory|null */
 	private $keys;
 
+	/** @var \Composer\Installer\PackageEvent */
 	private $event;
 
-	public function __construct(string $name, KeyDirectory $keys, IOInterface $io, PackageEvent $event)
+	public function __construct(string $name, ?KeyDirectory $keys, IOInterface $io, PackageEvent $event)
 	{
-		$this->name = $name;
-		$this->io = $io;
-		$this->keys = $keys;
+		$this->name  = $name;
+		$this->keys  = $keys;
+		$this->io    = $io;
 		$this->event = $event;
 	}
 
-	public function install(FileList $filelist) : void
+	public function install(FileList $fileList) : void
 	{
 		try {
 			$packageVersion = PackageVersion::fromPackageEvent($this->event, $this->name);
@@ -54,35 +58,17 @@ final class Installer
 			$this->io->write($e->getMessage());
 			return;
 		}
+
 		$versionReplacer = new VersionConstraintReplacer($packageVersion);
 
-		$factory = new Factory();
-
-		$verify = new Verify($this->keys, $factory->createGnuPG(new Directory(
-			sys_get_temp_dir()
-		)));
-
-		$binDir = $this->event->getComposer()->getConfig()->get('bin-dir');
-		if (! file_exists($binDir)) {
-			mkdir($binDir, 0777, true);
-		}
-
-		/** @var File $file */
-		foreach ($filelist->getList() as $file) {
+		foreach ($fileList->getList() as $file) {
 			$this->io->write(sprintf(
 				'downloading Artifact in version %2$s from %1$s',
 				$versionReplacer->replace($file->pharUrl()->toString()),
 				$packageVersion->fullVersion()
 			));
-			$download = new Download(Url::fromString(
-				$versionReplacer->replace($file->pharUrl()->toString())
-			));
-			$pharLocation = new SplFileInfo(
-				$binDir . DIRECTORY_SEPARATOR . $file->pharName()
-			);
-			$download->toLocation($pharLocation);
 
-			chmod($pharLocation->getRealPath(), 0755);
+			$pharLocation = $this->downloadPhar($versionReplacer, $file);
 
 			if (!$file->signatureUrl()) {
 				$this->io->write(sprintf(
@@ -91,15 +77,55 @@ final class Installer
 				continue;
 			}
 
-			$downloadSignature = new Download(Url::fromString(
-				$versionReplacer->replace($file->signatureUrl()->toString())
-			));
-			$signatureLocation = new SplFileInfo(sys_get_temp_dir() . '/' . $file->pharName() . '.asc');
-			$downloadSignature->toLocation($signatureLocation);
+			$signatureLocation = $this->downloadSignature($versionReplacer, $file);
+			$this->verifyPharWithSignature($pharLocation, $signatureLocation);
+			unlink($signatureLocation->getPathname());
+		}
+	}
 
-			if (!$verify->fileWithSignature($pharLocation, $signatureLocation)) {
-				throw new RuntimeException('Signature Verification failed');
-			}
+	private function downloadPhar(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
+	{
+		$binDir       = $this->event->getComposer()->getConfig()->get('bin-dir');
+		$download     = new Download(Url::fromString(
+			$versionReplacer->replace($file->pharUrl()->toString())
+		));
+		$pharLocation = new SplFileInfo(
+			$binDir . DIRECTORY_SEPARATOR . $file->pharName()
+		);
+
+		if (! file_exists($binDir)) {
+			mkdir($binDir, 0777, true);
+		}
+		$download->toLocation($pharLocation);
+		chmod($pharLocation->getRealPath(), 0755);
+
+		return $pharLocation;
+	}
+
+	private function downloadSignature(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
+	{
+		$downloadSignature = new Download(Url::fromString(
+			$versionReplacer->replace($file->signatureUrl()->toString())
+		));
+		$signatureLocation = new SplFileInfo(sys_get_temp_dir() . '/' . $file->pharName() . '.asc');
+		$downloadSignature->toLocation($signatureLocation);
+
+		return $signatureLocation;
+	}
+
+	private function verifyPharWithSignature(SplFileInfo $pharLocation, SplFileInfo $signatureLocation): void
+	{
+		if (null === $this->keys) {
+			throw new RuntimeException('No keys to verify the signature');
+		}
+		$factory = new Factory();
+		$verify  = new Verify(
+			$this->keys,
+			$factory->createGnuPG(new Directory(sys_get_temp_dir()))
+		);
+
+		if (!$verify->fileWithSignature($pharLocation, $signatureLocation)) {
+			throw new RuntimeException('Signature Verification failed');
 		}
 	}
 }
