@@ -14,6 +14,7 @@ use Exception;
 use PharIo\ComposerDistributor\ConfiguredMediator;
 use PHPUnit\Framework\TestCase;
 use function file_exists;
+use function getenv;
 use function sys_get_temp_dir;
 use function unlink;
 use function var_dump;
@@ -123,12 +124,14 @@ class InstallationTest extends TestCase
 	{
 		parent::setUp();
 
-		if (file_exists(sys_get_temp_dir() . '/trustdb.gpg')) {
-			unlink(sys_get_temp_dir() . '/trustdb.gpg');
+		$gpgHome = getenv('GNUPGHOME');
+
+		if (file_exists($gpgHome . '/trustdb.gpg')) {
+			unlink($gpgHome . '/trustdb.gpg');
 		}
 
-		if (file_exists(sys_get_temp_dir() . '/pubring.kbx')) {
-			unlink(sys_get_temp_dir() . '/pubring.kbx');
+		if (file_exists($gpgHome . '/pubring.kbx')) {
+			unlink($gpgHome . '/pubring.kbx');
 		}
 	}
 }

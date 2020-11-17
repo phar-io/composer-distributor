@@ -1,6 +1,6 @@
 {
 	"packageName": "foo/bar",
-	"keyDirectory": "tests/_assets/faultykeys",
+	"keyDirectory": "tests/integration/_assets/keys",
 	"phars": [
 		{
 			"name": "foo",
