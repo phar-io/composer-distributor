@@ -11,6 +11,7 @@ namespace PharIo\ComposerDistributor\Service;
 
 use GnuPG;
 use PharIo\ComposerDistributor\KeyDirectory;
+use RuntimeException;
 use SplFileInfo;
 use function array_filter;
 use function count;
@@ -28,9 +29,7 @@ final class Verify
         $result = [];
 
         foreach ($keys->getList() as $key) {
-            $result[] = $this->gpg->import(
-                file_get_contents($key->getPathname())
-            );
+            $result[] = $this->gpg->import(file_get_contents($key->getPathname()));
         }
 
         $array = array_filter($result, function ($item) {
@@ -39,7 +38,7 @@ final class Verify
 
         if (0 >= count($array)) {
             // when imported is 0 but fingerprint is available the key are already imported/exist
-            throw new \RuntimeException('Could not import needed GPG key!');
+            throw new RuntimeException('Could not import needed GPG key!');
         }
     }
 
@@ -50,18 +49,13 @@ final class Verify
             file_get_contents($signature->getPathname()),
         );
 
-        switch (true) {
-            case false === $result:
-            case $result[0]['summary'] !== 0:
-                throw new \RuntimeException(sprintf(
-                    'Verification between "%s" and "%s" failed!',
-                    $signature->getFilename(),
-                    $file->getFilename()
-                ));
-                break;
-            default:
+        if ($result === false || $result[0]['summary'] !== 0) {
+            throw new RuntimeException(sprintf(
+                'Verification between "%s" and "%s" failed!',
+                $signature->getFilename(),
+                $file->getFilename()
+            ));
         }
-
         return true;
     }
 }
