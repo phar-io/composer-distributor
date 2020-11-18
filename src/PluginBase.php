@@ -20,49 +20,49 @@ use SplFileInfo;
 
 abstract class PluginBase implements PluginInterface, EventSubscriberInterface
 {
-	protected $composer;
+    protected $composer;
 
-	protected $io;
+    protected $io;
 
-	public function activate(Composer $composer, IOInterface $io)
-	{
-		$this->composer = $composer;
-		$this->io = $io;
-	}
+    public function activate(Composer $composer, IOInterface $io)
+    {
+        $this->composer = $composer;
+        $this->io = $io;
+    }
 
-	public function deactivate(Composer $composer, IOInterface $io)
-	{
-		$this->composer = $composer;
-		$this->io = $io;
-	}
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+        $this->composer = $composer;
+        $this->io = $io;
+    }
 
-	public function uninstall(Composer $composer, IOInterface $io)
-	{
-		$this->composer = $composer;
-		$this->io = $io;
-	}
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+        $this->composer = $composer;
+        $this->io = $io;
+    }
 
-	public static function getSubscribedEvents()
-	{
-		return [
-			PackageEvents::POST_PACKAGE_INSTALL => [
-				['installOrUpdateFunction', 0],
-			],
-			PackageEvents::POST_PACKAGE_UPDATE => [
-				['installOrUpdateFunction', 0],
-			],
-		];
-	}
+    public static function getSubscribedEvents()
+    {
+        return [
+            PackageEvents::POST_PACKAGE_INSTALL => [
+                ['installOrUpdateFunction', 0],
+            ],
+            PackageEvents::POST_PACKAGE_UPDATE => [
+                ['installOrUpdateFunction', 0],
+            ],
+        ];
+    }
 
-	public function createInstaller(string $pluginName, string $keyDirectory, PackageEvent $event) : Installer
-	{
-		return new Installer(
-			$pluginName,
-			new KeyDirectory(new SplFileInfo($keyDirectory)),
-			$this->io,
-			$event
-		);
-	}
+    public function createInstaller(string $pluginName, string $keyDirectory, PackageEvent $event) : Installer
+    {
+        return new Installer(
+            $pluginName,
+            new KeyDirectory(new SplFileInfo($keyDirectory)),
+            $this->io,
+            $event
+        );
+    }
 
-	abstract public function installOrUpdateFunction(PackageEvent $event) : void;
+    abstract public function installOrUpdateFunction(PackageEvent $event) : void;
 }

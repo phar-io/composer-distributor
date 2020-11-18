@@ -13,8 +13,8 @@ use RuntimeException;
 
 final class NoSemanticVersioning extends RuntimeException
 {
-	public static function fromversionString(string $version) : self
-	{
-		return new self(sprintf('The version string "%s" does not follow semantic versioning', $version));
-	}
+    public static function fromversionString(string $version) : self
+    {
+        return new self(sprintf('The version string "%s" does not follow semantic versioning', $version));
+    }
 }

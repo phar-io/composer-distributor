@@ -2,11 +2,11 @@ root = true
 
 [*]
 charset = utf-8
-indent_style = tab
+indent_style = space
 tab_width = 4
 insert_final_newline = true
 end_of_line = lf
-max_line_length = 80
+max_line_length = 120
 trim_trailing_whitespace = true
 
 [*.json]

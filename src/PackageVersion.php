@@ -29,102 +29,102 @@ use function version_compare;
 
 final class PackageVersion
 {
-	private $name;
+    private $name;
 
-	private $versionString;
+    private $versionString;
 
-	private $semver;
+    private $semver;
 
-	private function __construct(string $name, string $versionString)
-	{
-		$this->name = $name;
-		$this->versionString = $versionString;
-		try {
-			$this->semver = SemanticVersion::fromVersionString($versionString);
-		} catch (Throwable $e) {
-			$this->semver = null;
-		}
-	}
+    private function __construct(string $name, string $versionString)
+    {
+        $this->name = $name;
+        $this->versionString = $versionString;
+        try {
+            $this->semver = SemanticVersion::fromVersionString($versionString);
+        } catch (Throwable $e) {
+            $this->semver = null;
+        }
+    }
 
-	public function name() : string
-	{
-		return $this->name;
-	}
+    public function name() : string
+    {
+        return $this->name;
+    }
 
-	public function fullVersion() : string
-	{
-		return $this->versionString;
-	}
+    public function fullVersion() : string
+    {
+        return $this->versionString;
+    }
 
-	public function major() : string
-	{
-		if (!$this->semver instanceof SemanticVersion) {
-			return '';
-		}
+    public function major() : string
+    {
+        if (!$this->semver instanceof SemanticVersion) {
+            return '';
+        }
 
-		return (string)$this->semver->major();
-	}
+        return (string)$this->semver->major();
+    }
 
-	public function minor() : string
-	{
-		if (!$this->semver instanceof SemanticVersion) {
-			return '';
-		}
-		return (string)$this->semver->minor();
-	}
+    public function minor() : string
+    {
+        if (!$this->semver instanceof SemanticVersion) {
+            return '';
+        }
+        return (string)$this->semver->minor();
+    }
 
-	public function patch() : string
-	{
-		if (!$this->semver instanceof SemanticVersion) {
-			return '';
-		}
-		return (string)$this->semver->patch();
-	}
+    public function patch() : string
+    {
+        if (!$this->semver instanceof SemanticVersion) {
+            return '';
+        }
+        return (string)$this->semver->patch();
+    }
 
-	public function build() : string
-	{
-		if (!$this->semver instanceof SemanticVersion) {
-			return '';
-		}
-		return $this->semver->build();
-	}
+    public function build() : string
+    {
+        if (!$this->semver instanceof SemanticVersion) {
+            return '';
+        }
+        return $this->semver->build();
+    }
 
-	public function preRelease() : string
-	{
-		if (!$this->semver instanceof SemanticVersion) {
-			return '';
-		}
-		return $this->semver->preRelease();
-	}
+    public function preRelease() : string
+    {
+        if (!$this->semver instanceof SemanticVersion) {
+            return '';
+        }
+        return $this->semver->preRelease();
+    }
 
-	public static function fromPackageEvent(PackageEvent $event, string $pluginName) : self
-	{
-		$package = null;
-		if (0 >= version_compare('2.0.0', Composer::VERSION)) {
-			$operation = $event->getOperation();
-			switch (true) {
-				case $operation instanceof InstallOperation:
-				case $operation instanceof UninstallOperation:
-					$package = $operation->getPackage();
-					break;
-				case $operation instanceof UpdateOperation:
-					$package = $operation->getTargetPackage();
-					break;
-				default:
-					throw new RuntimeException('No valid operation found');
-			}
-		} else {
-			/** @var GenericRule $rule */
-			$rule = $event->getOperation()->getReason();
-			/** @var MultiConstraint $constraint */
-			$constraint = $rule->getJob()['constraint'];
-			if ($rule->getRequiredPackage() !== $pluginName) {
-				throw SomebodyElsesProblem::here($pluginName);
-			}
+    public static function fromPackageEvent(PackageEvent $event, string $pluginName) : self
+    {
+        $package = null;
+        if (0 >= version_compare('2.0.0', Composer::VERSION)) {
+            $operation = $event->getOperation();
+            switch (true) {
+                case $operation instanceof InstallOperation:
+                case $operation instanceof UninstallOperation:
+                    $package = $operation->getPackage();
+                    break;
+                case $operation instanceof UpdateOperation:
+                    $package = $operation->getTargetPackage();
+                    break;
+                default:
+                    throw new RuntimeException('No valid operation found');
+            }
+        } else {
+            /** @var GenericRule $rule */
+            $rule = $event->getOperation()->getReason();
+            /** @var MultiConstraint $constraint */
+            $constraint = $rule->getJob()['constraint'];
+            if ($rule->getRequiredPackage() !== $pluginName) {
+                throw SomebodyElsesProblem::here($pluginName);
+            }
 
-			/** @var CompletePackage $packages */
-			$package = $event->getInstalledRepo()->findPackage($rule->getRequiredPackage(), $constraint->getPrettyString());
-		}
-		return new self($package->getName(), $package->getFullPrettyVersion());
-	}
+            /** @var CompletePackage $packages */
+            $package = $event->getInstalledRepo()->findPackage($rule->getRequiredPackage(), $constraint->getPrettyString());
+        }
+        return new self($package->getName(), $package->getFullPrettyVersion());
+    }
 }

@@ -15,32 +15,32 @@ use SplFileInfo;
 
 final class KeyDirectory implements Iterator
 {
-	use IteratorImplementation;
+    use IteratorImplementation;
 
-	/** @var SplFileInfo[] */
-	private $keys;
+    /** @var SplFileInfo[] */
+    private $keys;
 
-	public function __construct(SplFileInfo $publicKeyFolder)
-	{
-		$this->keys = [];
+    public function __construct(SplFileInfo $publicKeyFolder)
+    {
+        $this->keys = [];
 
 
-		if (!$publicKeyFolder->isDir()) {
-			$this->keys[] = $publicKeyFolder;
-			return;
-		}
+        if (!$publicKeyFolder->isDir()) {
+            $this->keys[] = $publicKeyFolder;
+            return;
+        }
 
-		foreach (new DirectoryIterator($publicKeyFolder->getPathname()) as $item) {
-			if (!$item->isFile()) {
-				continue;
-			}
+        foreach (new DirectoryIterator($publicKeyFolder->getPathname()) as $item) {
+            if (!$item->isFile()) {
+                continue;
+            }
 
-			$this->keys[] = new SplFileInfo($item->getPathname());
-		}
-	}
+            $this->keys[] = new SplFileInfo($item->getPathname());
+        }
+    }
 
-	public function &getList() : array
-	{
-		return $this->keys;
-	}
+    public function &getList() : array
+    {
+        return $this->keys;
+    }
 }
