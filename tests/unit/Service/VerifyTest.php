@@ -7,6 +7,7 @@ namespace PharIo\ComposerDistributorTest\Service;
 use Exception;
 use GnuPG;
 use PharIo\ComposerDistributor\KeyDirectory;
+use PharIo\ComposerDistributor\Service\KeyError;
 use PharIo\ComposerDistributor\Service\Verify;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -34,8 +35,8 @@ class VerifyTest extends TestCase
             ->getMock();
         $gpg->method('import')->willReturn(['imported' => 0]);
 
-        self::expectException(RuntimeException::class);
-        self::expectExceptionMessage('Could not import needed GPG key!');
+        self::expectException(KeyError::class);
+        self::expectExceptionMessage('Could not import required GPG key!');
 
         new Verify($keys, $gpg);
     }
