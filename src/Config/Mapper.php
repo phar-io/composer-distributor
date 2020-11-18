@@ -4,93 +4,74 @@ declare(strict_types=1);
 
 namespace PharIo\ComposerDistributor\Config;
 
+use DOMDocument;
 use PharIo\ComposerDistributor\File;
 use PharIo\ComposerDistributor\FileList;
 use PharIo\ComposerDistributor\Url;
+use RuntimeException;
 
 class Mapper
 {
-    /**
-     * Expected format:
-     *
-     * 'keyDirectory' and 'signature' are optional
-     *
-     * [
-     *   'packageName'  => 'phar-io/phive',
-     *   'keyDirectory' => 'keys',
-     *   'phars'        => [
-     *     [
-     *       'name'      => 'phive',
-     *       'file'      => 'https://github.com/phar-io/phive/releases/%version%/phive.phar',
-     *       'signature' => 'https://github.com/phar-io/phive/releases/%version%/phive.phar.asc'
-     *     ]
-     *   ]
-     * ]
-     *
-     */
-    public function createConfig(array $configData): Config
+    /** @var \DOMDocument */
+    private $document;
+
+    public function createConfig(DOMDocument $docDocument): Config
     {
-        $this->validateBaseConfig($configData);
-        $this->validatePharsConfig($configData);
+        $this->document = $docDocument;
+        $this->validateConfigurationAgainstSchema();
 
         return new Config(
-            $configData['packageName'],
-            $this->createPhars($configData['phars']),
-            $this->createKeyDir($configData)
+            $this->packageName(),
+            $this->createPhars(),
+            $this->createKeyDir()
         );
     }
 
-    private function createKeyDir(array $configData): ?\SplFileInfo
+    private function validateConfigurationAgainstSchema()
     {
-        return isset($configData['keyDirectory'])
-            ? new \SplFileInfo($configData['keyDirectory'])
-            : null;
+        $original    = \libxml_use_internal_errors(true);
+        $xsdFilename = __DIR__ . '/../../distributor.xsd';
+        $errors      = [];
+
+        if ($this->document->schemaValidate($xsdFilename)) {
+            return;
+        }
+
+        $errors = \libxml_get_errors();
+
+        \libxml_clear_errors();
+        \libxml_use_internal_errors($original);
+
+        if (count($errors) > 0) {
+            throw ValidationFailed::fromXMLErrors($errors);
+        }
     }
 
-    private function createPhars(array $pharsData): FileList
+    private function packageName(): string
+    {
+        return $this->document->documentElement->getAttribute('packageName');
+    }
+
+    private function createPhars(): FileList
     {
         $phars = [];
-        foreach ($pharsData as $phar) {
+        foreach ($this->document->getElementsByTagName('phar') as $phar) {
             $phars[] = new File(
-                $phar['name'],
-                Url::fromString($phar['file']),
-                !empty($phar['signature']) ? Url::fromString($phar['signature']) : null
+                $phar->getAttribute('name'),
+                Url::fromString($phar->getAttribute('file')),
+                $phar->hasAttribute('signature') ? Url::fromString($phar->getAttribute('signature')) : null
             );
         }
 
         return new FileList(...$phars);
     }
 
-    private function validateBaseConfig(array $configData): void
+    private function createKeyDir(): ?\SplFileInfo
     {
-        if (!isset($configData['packageName']) || !is_string($configData['packageName'])) {
-            throw new \RuntimeException('Config value for  \'packageName\' is missing');
-        }
-        if (isset($configData['keyDirectory']) && !is_string($configData['keyDirectory'])) {
-            throw new \RuntimeException('Invalid \'keyDirectory\'');
-        }
-    }
+        $root = $this->document->documentElement;
 
-    private function validatePharsConfig(array $configData): void
-    {
-        if (!isset($configData['phars']) || !is_array($configData['phars']) || count($configData['phars']) < 1) {
-            throw new \RuntimeException('Invalid \'phars\' configuration');
-        }
-        foreach ($configData['phars'] as $phar) {
-            $this->validatePharConfig($phar);
-        }
-    }
-
-    private function validatePharConfig(array $pharData): void
-    {
-        if (!isset($pharData['name']) || !is_string($pharData['name']) || empty($pharData['name'])) {
-            throw new \RuntimeException('Invalid phar config  \'name\' is missing');
-        }
-        if (!isset($pharData['file']) || !is_string($pharData['file']) || empty($pharData['file'])) {
-            throw new \RuntimeException('Invalid phar config  \'file\' is missing');
-        }
-        if (isset($pharData['signature']) && !is_string($pharData['signature'])) {
-            throw new \RuntimeException('Invalid \'signature\'');
-        }
+        return $root->hasAttribute('keyDirectory')
+            ? new \SplFileInfo($root->getAttribute('keyDirectory'))
+            : null;
     }
 }
