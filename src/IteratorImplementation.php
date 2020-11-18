@@ -16,30 +16,30 @@ use function reset;
 
 trait IteratorImplementation
 {
-	public abstract function &getList() : array;
+    abstract public function &getList() : array;
 
-	public function current()
-	{
-		return current($this->getList());
-	}
+    public function current()
+    {
+        return current($this->getList());
+    }
 
-	public function next()
-	{
-		next($this->getList());
-	}
+    public function next()
+    {
+        next($this->getList());
+    }
 
-	public function key()
-	{
-		return key($this->getList());
-	}
+    public function key()
+    {
+        return key($this->getList());
+    }
 
-	public function valid()
-	{
-		return false === key($this->getList());
-	}
+    public function valid()
+    {
+        return false === key($this->getList());
+    }
 
-	public function rewind()
-	{
-		return reset($this->getList());
-	}
+    public function rewind()
+    {
+        return reset($this->getList());
+    }
 }

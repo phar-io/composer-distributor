@@ -16,21 +16,21 @@ use function fwrite;
 
 final class Download
 {
-	private $url;
+    private $url;
 
-	public function __construct(Url $url)
-	{
-		$this->url = $url;
-	}
+    public function __construct(Url $url)
+    {
+        $this->url = $url;
+    }
 
-	public function toLocation(SplFileInfo $downloadLocation) : void
-	{
-		$source = fopen($this->url->toString(), 'r');
-		$target = fopen($downloadLocation->getPathname(), 'w');
-		while (!feof($source)) {
-			fwrite($target, fread($source, 1024));
-		}
-		fclose($source);
-		fclose($target);
-	}
+    public function toLocation(SplFileInfo $downloadLocation) : void
+    {
+        $source = fopen($this->url->toString(), 'r');
+        $target = fopen($downloadLocation->getPathname(), 'w');
+        while (!feof($source)) {
+            fwrite($target, fread($source, 1024));
+        }
+        fclose($source);
+        fclose($target);
+    }
 }

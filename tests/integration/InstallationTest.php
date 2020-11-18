@@ -21,117 +21,114 @@ use function var_dump;
 
 class InstallationTest extends TestCase
 {
-	public function testInstallationWithoutSignatureWorks(): void
-	{
-		$class = new class() extends ConfiguredMediator {
+    public function testInstallationWithoutSignatureWorks(): void
+    {
+        $class = new class() extends ConfiguredMediator {
+            protected function getMediatorConfig() : string
+            {
+                return __DIR__ . '/_assets/installWithoutSignature.json';
+            }
+        };
 
-			protected function getMediatorConfig() : string
-			{
-				return __DIR__ . '/_assets/installWithoutSignature.json';
-			}
-		};
+        $composer     = self::createMock(Composer::class);
+        $ioInterface  = self::createMock(IOInterface::class);
+        $packageEvent = self::createMock(PackageEvent::class);
+        $package      = self::createMock(Package::class);
+        $config       = self::createMock(Config::class);
+        $operation    = self::createMock(InstallOperation::class);
+        $config->method('get')->with('bin-dir')->willReturn(__DIR__ . '/_assets');
+        $composer->method('getPackage')->willReturn($package);
+        $composer->method('getConfig')->willReturn($config);
+        $package->method('getName')->willReturn('foo/bar');
+        $package->method('getFullPrettyVersion')->willReturn('0.5.0');
+        $packageEvent->method('getOperation')->willReturn($operation);
+        $packageEvent->method('getComposer')->willReturn($composer);
+        $operation->method('getPackage')->willReturn($package);
 
-		$composer     = self::createMock(Composer::class);
-		$ioInterface  = self::createMock(IOInterface::class);
-		$packageEvent = self::createMock(PackageEvent::class);
-		$package      = self::createMock(Package::class);
-		$config       = self::createMock(Config::class);
-		$operation    = self::createMock(InstallOperation::class);
-		$config->method('get')->with('bin-dir')->willReturn(__DIR__ . '/_assets');
-		$composer->method('getPackage')->willReturn($package);
-		$composer->method('getConfig')->willReturn($config);
-		$package->method('getName')->willReturn('foo/bar');
-		$package->method('getFullPrettyVersion')->willReturn('0.5.0');
-		$packageEvent->method('getOperation')->willReturn($operation);
-		$packageEvent->method('getComposer')->willReturn($composer);
-		$operation->method('getPackage')->willReturn($package);
+        $class->activate($composer, $ioInterface);
+        $class->installOrUpdateFunction($packageEvent);
 
-		$class->activate($composer, $ioInterface);
-		$class->installOrUpdateFunction($packageEvent);
+        self::assertFileExists(__DIR__ . '/_assets/foo');
 
-		self::assertFileExists(__DIR__ . '/_assets/foo');
+        unlink(__DIR__ . '/_assets/foo');
+    }
 
-		unlink(__DIR__ . '/_assets/foo');
-	}
+    public function testInstallationWithSignatureWorks(): void
+    {
+        $class = new class() extends ConfiguredMediator {
+            protected function getMediatorConfig() : string
+            {
+                return __DIR__ . '/_assets/installWithSignature.json';
+            }
+        };
 
-	public function testInstallationWithSignatureWorks(): void
-	{
-		$class = new class() extends ConfiguredMediator {
+        $composer     = self::createMock(Composer::class);
+        $ioInterface  = self::createMock(IOInterface::class);
+        $packageEvent = self::createMock(PackageEvent::class);
+        $package      = self::createMock(Package::class);
+        $config       = self::createMock(Config::class);
+        $operation    = self::createMock(InstallOperation::class);
+        $config->method('get')->with('bin-dir')->willReturn(__DIR__ . '/_assets');
+        $composer->method('getPackage')->willReturn($package);
+        $composer->method('getConfig')->willReturn($config);
+        $package->method('getName')->willReturn('foo/bar');
+        $package->method('getFullPrettyVersion')->willReturn('0.5.0');
+        $packageEvent->method('getOperation')->willReturn($operation);
+        $packageEvent->method('getComposer')->willReturn($composer);
+        $operation->method('getPackage')->willReturn($package);
 
-			protected function getMediatorConfig() : string
-			{
-				return __DIR__ . '/_assets/installWithSignature.json';
-			}
-		};
+        $class->activate($composer, $ioInterface);
+        $class->installOrUpdateFunction($packageEvent);
 
-		$composer     = self::createMock(Composer::class);
-		$ioInterface  = self::createMock(IOInterface::class);
-		$packageEvent = self::createMock(PackageEvent::class);
-		$package      = self::createMock(Package::class);
-		$config       = self::createMock(Config::class);
-		$operation    = self::createMock(InstallOperation::class);
-		$config->method('get')->with('bin-dir')->willReturn(__DIR__ . '/_assets');
-		$composer->method('getPackage')->willReturn($package);
-		$composer->method('getConfig')->willReturn($config);
-		$package->method('getName')->willReturn('foo/bar');
-		$package->method('getFullPrettyVersion')->willReturn('0.5.0');
-		$packageEvent->method('getOperation')->willReturn($operation);
-		$packageEvent->method('getComposer')->willReturn($composer);
-		$operation->method('getPackage')->willReturn($package);
+        self::assertFileExists(__DIR__ . '/_assets/foo');
 
-		$class->activate($composer, $ioInterface);
-		$class->installOrUpdateFunction($packageEvent);
+        unlink(__DIR__ . '/_assets/foo');
+    }
 
-		self::assertFileExists(__DIR__ . '/_assets/foo');
+    public function testInstallationWithFaultySignatureFails(): void
+    {
+        $class = new class() extends ConfiguredMediator {
+            protected function getMediatorConfig() : string
+            {
+                return __DIR__ . '/_assets/installWithFaultySignature.json';
+            }
+        };
 
-		unlink(__DIR__ . '/_assets/foo');
-	}
+        $composer     = self::createMock(Composer::class);
+        $ioInterface  = self::createMock(IOInterface::class);
+        $packageEvent = self::createMock(PackageEvent::class);
+        $package      = self::createMock(Package::class);
+        $config       = self::createMock(Config::class);
+        $operation    = self::createMock(InstallOperation::class);
+        $config->method('get')->with('bin-dir')->willReturn(__DIR__ . '/_assets');
+        $composer->method('getPackage')->willReturn($package);
+        $composer->method('getConfig')->willReturn($config);
+        $package->method('getName')->willReturn('foo/bar');
+        $package->method('getFullPrettyVersion')->willReturn('0.5.0');
+        $packageEvent->method('getOperation')->willReturn($operation);
+        $packageEvent->method('getComposer')->willReturn($composer);
+        $operation->method('getPackage')->willReturn($package);
 
-	public function testInstallationWithFaultySignatureFails(): void
-	{
-		$class = new class() extends ConfiguredMediator {
+        self::expectException(Exception::class);
 
-			protected function getMediatorConfig() : string
-			{
-				return __DIR__ . '/_assets/installWithFaultySignature.json';
-			}
-		};
+        $class->activate($composer, $ioInterface);
+        $class->installOrUpdateFunction($packageEvent);
 
-		$composer     = self::createMock(Composer::class);
-		$ioInterface  = self::createMock(IOInterface::class);
-		$packageEvent = self::createMock(PackageEvent::class);
-		$package      = self::createMock(Package::class);
-		$config       = self::createMock(Config::class);
-		$operation    = self::createMock(InstallOperation::class);
-		$config->method('get')->with('bin-dir')->willReturn(__DIR__ . '/_assets');
-		$composer->method('getPackage')->willReturn($package);
-		$composer->method('getConfig')->willReturn($config);
-		$package->method('getName')->willReturn('foo/bar');
-		$package->method('getFullPrettyVersion')->willReturn('0.5.0');
-		$packageEvent->method('getOperation')->willReturn($operation);
-		$packageEvent->method('getComposer')->willReturn($composer);
-		$operation->method('getPackage')->willReturn($package);
+        unlink(__DIR__ . '/_assets/foo');
+    }
 
-		self::expectException(Exception::class);
+    public function setUp() : void
+    {
+        parent::setUp();
 
-		$class->activate($composer, $ioInterface);
-		$class->installOrUpdateFunction($packageEvent);
+        $gpgHome = getenv('GNUPGHOME');
 
-		unlink(__DIR__ . '/_assets/foo');
-	}
+        if (file_exists($gpgHome . '/trustdb.gpg')) {
+            unlink($gpgHome . '/trustdb.gpg');
+        }
 
-	public function setUp() : void
-	{
-		parent::setUp();
-
-		$gpgHome = getenv('GNUPGHOME');
-
-		if (file_exists($gpgHome . '/trustdb.gpg')) {
-			unlink($gpgHome . '/trustdb.gpg');
-		}
-
-		if (file_exists($gpgHome . '/pubring.kbx')) {
-			unlink($gpgHome . '/pubring.kbx');
-		}
-	}
+        if (file_exists($gpgHome . '/pubring.kbx')) {
+            unlink($gpgHome . '/pubring.kbx');
+        }
+    }
 }

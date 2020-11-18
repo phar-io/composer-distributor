@@ -30,102 +30,102 @@ use const DIRECTORY_SEPARATOR;
 
 final class Installer
 {
-	/** @var \Composer\IO\IOInterface */
-	private $io;
+    /** @var \Composer\IO\IOInterface */
+    private $io;
 
-	/** @var string  */
-	private $name;
+    /** @var string  */
+    private $name;
 
-	/** @var \PharIo\ComposerDistributor\KeyDirectory|null */
-	private $keys;
+    /** @var \PharIo\ComposerDistributor\KeyDirectory|null */
+    private $keys;
 
-	/** @var \Composer\Installer\PackageEvent */
-	private $event;
+    /** @var \Composer\Installer\PackageEvent */
+    private $event;
 
-	public function __construct(string $name, ?KeyDirectory $keys, IOInterface $io, PackageEvent $event)
-	{
-		$this->name  = $name;
-		$this->keys  = $keys;
-		$this->io    = $io;
-		$this->event = $event;
-	}
+    public function __construct(string $name, ?KeyDirectory $keys, IOInterface $io, PackageEvent $event)
+    {
+        $this->name  = $name;
+        $this->keys  = $keys;
+        $this->io    = $io;
+        $this->event = $event;
+    }
 
-	public function install(FileList $fileList) : void
-	{
-		try {
-			$packageVersion = PackageVersion::fromPackageEvent($this->event, $this->name);
-		} catch (SomebodyElsesProblem $e) {
-			$this->io->write($e->getMessage());
-			return;
-		}
+    public function install(FileList $fileList) : void
+    {
+        try {
+            $packageVersion = PackageVersion::fromPackageEvent($this->event, $this->name);
+        } catch (SomebodyElsesProblem $e) {
+            $this->io->write($e->getMessage());
+            return;
+        }
 
-		$versionReplacer = new VersionConstraintReplacer($packageVersion);
+        $versionReplacer = new VersionConstraintReplacer($packageVersion);
 
-		foreach ($fileList->getList() as $file) {
-			$this->io->write(sprintf(
-				'downloading Artifact in version %2$s from %1$s',
-				$versionReplacer->replace($file->pharUrl()->toString()),
-				$packageVersion->fullVersion()
-			));
+        foreach ($fileList->getList() as $file) {
+            $this->io->write(sprintf(
+                'downloading Artifact in version %2$s from %1$s',
+                $versionReplacer->replace($file->pharUrl()->toString()),
+                $packageVersion->fullVersion()
+            ));
 
-			$pharLocation = $this->downloadPhar($versionReplacer, $file);
+            $pharLocation = $this->downloadPhar($versionReplacer, $file);
 
-			if (!$file->signatureUrl()) {
-				$this->io->write(sprintf(
-					"No digital Signature found! Use this file with care!"
-				));
-				continue;
-			}
+            if (!$file->signatureUrl()) {
+                $this->io->write(sprintf(
+                    "No digital Signature found! Use this file with care!"
+                ));
+                continue;
+            }
 
-			$signatureLocation = $this->downloadSignature($versionReplacer, $file);
-			$this->verifyPharWithSignature($pharLocation, $signatureLocation);
-			unlink($signatureLocation->getPathname());
-		}
-	}
+            $signatureLocation = $this->downloadSignature($versionReplacer, $file);
+            $this->verifyPharWithSignature($pharLocation, $signatureLocation);
+            unlink($signatureLocation->getPathname());
+        }
+    }
 
-	private function downloadPhar(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
-	{
-		$binDir       = $this->event->getComposer()->getConfig()->get('bin-dir');
-		$download     = new Download(Url::fromString(
-			$versionReplacer->replace($file->pharUrl()->toString())
-		));
-		$pharLocation = new SplFileInfo(
-			$binDir . DIRECTORY_SEPARATOR . $file->pharName()
-		);
+    private function downloadPhar(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
+    {
+        $binDir       = $this->event->getComposer()->getConfig()->get('bin-dir');
+        $download     = new Download(Url::fromString(
+            $versionReplacer->replace($file->pharUrl()->toString())
+        ));
+        $pharLocation = new SplFileInfo(
+            $binDir . DIRECTORY_SEPARATOR . $file->pharName()
+        );
 
-		if (! file_exists($binDir)) {
-			mkdir($binDir, 0777, true);
-		}
-		$download->toLocation($pharLocation);
-		chmod($pharLocation->getRealPath(), 0755);
+        if (! file_exists($binDir)) {
+            mkdir($binDir, 0777, true);
+        }
+        $download->toLocation($pharLocation);
+        chmod($pharLocation->getRealPath(), 0755);
 
-		return $pharLocation;
-	}
+        return $pharLocation;
+    }
 
-	private function downloadSignature(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
-	{
-		$downloadSignature = new Download(Url::fromString(
-			$versionReplacer->replace($file->signatureUrl()->toString())
-		));
-		$signatureLocation = new SplFileInfo(sys_get_temp_dir() . '/' . $file->pharName() . '.asc');
-		$downloadSignature->toLocation($signatureLocation);
+    private function downloadSignature(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
+    {
+        $downloadSignature = new Download(Url::fromString(
+            $versionReplacer->replace($file->signatureUrl()->toString())
+        ));
+        $signatureLocation = new SplFileInfo(sys_get_temp_dir() . '/' . $file->pharName() . '.asc');
+        $downloadSignature->toLocation($signatureLocation);
 
-		return $signatureLocation;
-	}
+        return $signatureLocation;
+    }
 
-	private function verifyPharWithSignature(SplFileInfo $pharLocation, SplFileInfo $signatureLocation): void
-	{
-		if (null === $this->keys) {
-			throw new RuntimeException('No keys to verify the signature');
-		}
-		$factory = new Factory();
-		$verify  = new Verify(
-			$this->keys,
-			$factory->createGnuPG(new Directory(sys_get_temp_dir()))
-		);
+    private function verifyPharWithSignature(SplFileInfo $pharLocation, SplFileInfo $signatureLocation): void
+    {
+        if (null === $this->keys) {
+            throw new RuntimeException('No keys to verify the signature');
+        }
+        $factory = new Factory();
+        $verify  = new Verify(
+            $this->keys,
+            $factory->createGnuPG(new Directory(sys_get_temp_dir()))
+        );
 
-		if (!$verify->fileWithSignature($pharLocation, $signatureLocation)) {
-			throw new RuntimeException('Signature Verification failed');
-		}
-	}
+        if (!$verify->fileWithSignature($pharLocation, $signatureLocation)) {
+            throw new RuntimeException('Signature Verification failed');
+        }
+    }
 }

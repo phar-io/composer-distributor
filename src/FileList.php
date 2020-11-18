@@ -13,17 +13,17 @@ use Iterator;
 
 final class FileList implements Iterator
 {
-	use IteratorImplementation;
+    use IteratorImplementation;
 
-	private $list;
+    private $list;
 
-	public function __construct(File ...$files)
-	{
-		$this->list = $files;
-	}
+    public function __construct(File ...$files)
+    {
+        $this->list = $files;
+    }
 
-	public function &getList() : array
-	{
-		return $this->list;
-	}
+    public function &getList() : array
+    {
+        return $this->list;
+    }
 }
