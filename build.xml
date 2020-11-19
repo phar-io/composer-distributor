@@ -4,7 +4,7 @@
   <target name="setup" depends="clean,composer,install-tools"/>
   <target name="build" depends="setup,lint,test"/>
 
-  <target name="clean" unless="clean.done" description="Clean up and create artifact directories">
+  <target name="clean" unless="clean.done" description="Clean up and create log directories">
     <delete dir="${basedir}/build/docs"/>
     <delete dir="${basedir}/build/coverage"/>
     <delete dir="${basedir}/build/logs"/>
@@ -32,7 +32,6 @@
     </apply>
   </target>
 
-
   <target name="getphive" description="Get phive on travis-ci">
     <exec executable="wget" taskname="wget">
       <arg value="https://phar.io/releases/phive.phar"/>
@@ -50,7 +49,6 @@
     <delete file="phive.phar.asc"/>
   </target>
 
-
   <target name="prepare" unless="prepare.done" depends="clean" description="Prepare for build">
     <property name="prepare.done" value="true"/>
   </target>
@@ -61,7 +59,7 @@
 
   <target name="install-tools" unless="tools-installed"
           depends="-tools-installed" description="Install tools with Phive">
-    <exec executable="${phive.bin}" taskname="phive">
+    <exec executable="phive" taskname="phive">
       <arg value="install"/>
       <arg value="--copy"/>
       <arg value="--trust-gpg-keys"/>
@@ -70,8 +68,20 @@
     </exec>
   </target>
 
-  <target name="test" depends="install-tools" description="Run tests">
+  <target name="test" depends="install-tools" description="Run all tests">
     <exec executable="${basedir}/tools/phpunit" taskname="phpunit"/>
+  </target>
+
+  <target name="unittests" depends="install-tools" description="Run unit tests">
+    <exec executable="${basedir}/tools/phpunit" taskname="phpunit">
+      <arg value="--testsuite=default"/>
+    </exec>
+  </target>
+
+  <target name="integration" depends="install-tools" description="Run integration tests">
+    <exec executable="${basedir}/tools/phpunit" taskname="phpunit">
+      <arg value="--testsuite=integration"/>
+    </exec>
   </target>
 
   <target name="composer" description="Install composer dependencies (including dev)">
