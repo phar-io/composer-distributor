@@ -47,14 +47,20 @@ abstract class ConfiguredMediator extends PluginBase
 
         /** @var \PharIo\ComposerDistributor\File $phar */
         foreach ($config->phars() as $phar) {
-            $pharLocation = $binDir . DIRECTORY_SEPARATOR . $phar->pharName();
-            if (is_file($pharLocation)) {
-                $this->io->write(sprintf(
-                    'remove phar \'%1$s\'',
-                    $phar->pharName()
-                ));
-                unlink($pharLocation);
+            $this->deleteFile($phar, $binDir);
+        }
+    }
+
+    private function deleteFile(File $phar, string $binDir): void
+    {
+        $pharLocation = $binDir . DIRECTORY_SEPARATOR . $phar->pharName();
+        if (is_file($pharLocation)) {
+            if (!is_writable($pharLocation)) {
+                $this->io->write(sprintf('can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName()));
+                return;
             }
+            $this->io->write(sprintf('remove phar \'%1$s\'', $phar->pharName()));
+            unlink($pharLocation);
         }
     }
 }
