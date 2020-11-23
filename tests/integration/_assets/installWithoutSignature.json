@@ -1,9 +1,0 @@
-{
-	"packageName": "foo/bar",
-	"phars": [
-		{
-			"name": "foo",
-			"file": "https://github.com/heiglandreas/JUnitDiff/releases/download/0.5.0/junitdiff.phar"
-		}
-	]
-}
