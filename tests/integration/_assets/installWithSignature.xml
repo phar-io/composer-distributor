@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<distributor xmlns="https://phar.io/composer-distributor"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://phar.io/xml/distributor/1.0/schema.xsd"
+             packageName="foo/bar"
+             keyDirectory="tests/integration/_assets/keys">
+
+  <phar name="foo"
+        file="https://github.com/heiglandreas/JUnitDiff/releases/download/0.5.0/junitdiff.phar"
+        signature="https://github.com/heiglandreas/JUnitDiff/releases/download/0.5.0/junitdiff.phar.asc"/>
+
+</distributor>

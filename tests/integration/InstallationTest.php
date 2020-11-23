@@ -24,9 +24,9 @@ class InstallationTest extends TestCase
     public function testInstallationWithoutSignatureWorks(): void
     {
         $class = new class() extends ConfiguredMediator {
-            protected function getMediatorConfig() : string
+            protected function getDistributorConfig() : string
             {
-                return __DIR__ . '/_assets/installWithoutSignature.json';
+                return __DIR__ . '/_assets/installWithoutSignature.xml';
             }
         };
 
@@ -56,9 +56,9 @@ class InstallationTest extends TestCase
     public function testInstallationWithSignatureWorks(): void
     {
         $class = new class() extends ConfiguredMediator {
-            protected function getMediatorConfig() : string
+            protected function getDistributorConfig() : string
             {
-                return __DIR__ . '/_assets/installWithSignature.json';
+                return __DIR__ . '/_assets/installWithSignature.xml';
             }
         };
 
@@ -88,9 +88,9 @@ class InstallationTest extends TestCase
     public function testInstallationWithFaultySignatureFails(): void
     {
         $class = new class() extends ConfiguredMediator {
-            protected function getMediatorConfig() : string
+            protected function getDistributorConfig() : string
             {
-                return __DIR__ . '/_assets/installWithFaultySignature.json';
+                return __DIR__ . '/_assets/installWithFaultySignature.xml';
             }
         };
 

@@ -13,7 +13,7 @@ use PharIo\ComposerDistributor\Service\Installer;
 
 abstract class ConfiguredMediator extends PluginBase
 {
-    abstract protected function getMediatorConfig(): string;
+    abstract protected function getDistributorConfig(): string;
 
     public function uninstall(Composer $composer, IOInterface $io)
     {
@@ -24,7 +24,7 @@ abstract class ConfiguredMediator extends PluginBase
 
     public function installOrUpdateFunction(PackageEvent $event): void
     {
-        $config    = Loader::loadFile($this->getMediatorConfig());
+        $config    = Loader::loadFile($this->getDistributorConfig());
         $installer = $this->createInstallerFromConfig($config, $event);
 
         $installer->install($config->phars());
@@ -42,7 +42,7 @@ abstract class ConfiguredMediator extends PluginBase
 
     private function removePhars(): void
     {
-        $config = Loader::loadFile($this->getMediatorConfig());
+        $config = Loader::loadFile($this->getDistributorConfig());
         $binDir = $this->composer->getConfig()->get('bin-dir');
 
         /** @var \PharIo\ComposerDistributor\File $phar */
