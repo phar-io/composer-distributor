@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<distributor xmlns="https://phar.io/composer-distributor"
+                      keyDirectory="keys">
+
+  <phar name="phive"
+        signature="https://github.com/phar-io/phive/releases/%version%/phive.phar.asc"/>
+
+</distributor>

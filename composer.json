@@ -40,7 +40,8 @@
   },
   "require": {
     "php": "^7.3 || ^8.0",
-    "ext-json": "*",
+    "ext-dom": "*",
+    "ext-libxml": "*",
     "composer-plugin-api": "^1.1 || ^2.0",
     "phar-io/gnupg": "^0.9",
     "phar-io/filesystem": "^0.9"
@@ -48,5 +49,11 @@
   "require-dev": {
     "phpunit/phpunit": "^9.4",
     "composer/composer": "^2.0"
+  },
+  "scripts": {
+    "test": "tools/phpunit --testsuite=default",
+    "test-all": "tools/phpunit",
+    "fix": "tools/php-cs-fixer fix",
+    "fix-dry": "tools/php-cs-fixer fix --dry-run"
   }
 }

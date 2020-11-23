@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified"
+           targetNamespace="https://phar.io/composer-distributor" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:rep="https://phar.io/composer-distributor">
+
+  <xs:element name="distributor" type="rep:distributorType"/>
+
+  <xs:complexType name="distributorType">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element type="rep:pharType" name="phar"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string"  name="packageName" use="required"/>
+    <xs:attribute type="xs:string"  name="keyDirectory"/>
+  </xs:complexType>
+
+  <xs:element name="phar" type="rep:pharType"/>
+
+  <xs:complexType name="pharType">
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute type="xs:anyURI"  name="file" use="required"/>
+    <xs:attribute type="xs:anyURI"  name="signature"/>
+  </xs:complexType>
+
+</xs:schema>

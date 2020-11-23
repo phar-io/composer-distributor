@@ -15,7 +15,6 @@ use SplFileInfo;
 use function array_filter;
 use function count;
 use function file_get_contents;
-use function sprintf;
 
 final class Verify
 {
@@ -28,9 +27,7 @@ final class Verify
         $result = [];
 
         foreach ($keys->getList() as $key) {
-            $result[] = $this->gpg->import(
-                file_get_contents($key->getPathname())
-            );
+            $result[] = $this->gpg->import(file_get_contents($key->getPathname()));
         }
 
         $array = array_filter($result, function ($item) {
@@ -38,8 +35,8 @@ final class Verify
         });
 
         if (0 >= count($array)) {
-            // when imported is 0 but fingerprint is available the key are already imported/exist
-            throw new \RuntimeException('Could not import needed GPG key!');
+            // when imported is 0 but fingerprint is available the key is already imported
+            throw KeyError::importFailure();
         }
     }
 
@@ -50,18 +47,9 @@ final class Verify
             file_get_contents($signature->getPathname()),
         );
 
-        switch (true) {
-            case false === $result:
-            case $result[0]['summary'] !== 0:
-                throw new \RuntimeException(sprintf(
-                    'Verification between "%s" and "%s" failed!',
-                    $signature->getFilename(),
-                    $file->getFilename()
-                ));
-                break;
-            default:
+        if ($result === false || $result[0]['summary'] !== 0) {
+            throw GpgError::verificationFailed($file->getFilename(), $signature->getFilename());
         }
-
         return true;
     }
 }

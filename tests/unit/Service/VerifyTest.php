@@ -1,9 +1,4 @@
 <?php
-/**
- * Copyright by the ComposerDistributor-Team
- *
- * Licenses under the MIT-license. For details see the included file LICENSE.md
- */
 
 declare(strict_types=1);
 
@@ -12,18 +7,18 @@ namespace PharIo\ComposerDistributorTest\Service;
 use Exception;
 use GnuPG;
 use PharIo\ComposerDistributor\KeyDirectory;
+use PharIo\ComposerDistributor\Service\KeyError;
 use PharIo\ComposerDistributor\Service\Verify;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use SplFileInfo;
-use function var_dump;
 
 class VerifyTest extends TestCase
 {
     public function setUp() : void
     {
-        parent::setUp();
         require_once __DIR__ . '/../GnuPG.php';
+        parent::setUp();
     }
 
     /**
@@ -32,7 +27,7 @@ class VerifyTest extends TestCase
     public function testThatConstructorThrowsWithoutKeys(): void
     {
         $keys = new KeyDirectory(new SplFileInfo(
-            __DIR__ . '/_assets/emptyKeyDirectory'
+            $this->setupEmptyKeyDir()
         ));
 
         $gpg = self::getMockBuilder(GnuPG::class)
@@ -40,8 +35,8 @@ class VerifyTest extends TestCase
             ->getMock();
         $gpg->method('import')->willReturn(['imported' => 0]);
 
-        self::expectException(RuntimeException::class);
-        self::expectExceptionMessage('Could not import needed GPG key!');
+        self::expectException(KeyError::class);
+        self::expectExceptionMessage('Could not import required GPG key!');
 
         new Verify($keys, $gpg);
     }
@@ -52,7 +47,7 @@ class VerifyTest extends TestCase
     public function testThatConstructorWorksWithSingleKey(): void
     {
         $keys = new KeyDirectory(new SplFileInfo(
-            __DIR__ . '/_assets/singleKeyDirectory'
+            __DIR__ . '/../../_assets/keys/singleKeyDirectory'
         ));
 
         $gpg = self::getMockBuilder(GnuPG::class)
@@ -70,13 +65,13 @@ class VerifyTest extends TestCase
     public function testThatConstructorWorksWithAlreadyImportedKey(): void
     {
         $keys = new KeyDirectory(new SplFileInfo(
-            __DIR__ . '/_assets/singleKeyDirectory'
+            __DIR__ . '/../../_assets/keys/singleKeyDirectory'
         ));
 
         $gpg = self::createMock(GnuPG::class);
 
         $gpg->method('import')->willReturn([
-            'imported' => 0,
+            'imported'    => 0,
             'fingerprint' => 'a'
         ]);
 
@@ -89,22 +84,32 @@ class VerifyTest extends TestCase
     public function testThatCorrectVerificationWillNotThrowAnException(): void
     {
         $keys = new KeyDirectory(new SplFileInfo(
-            __DIR__ . '/_assets/singleKeyDirectory'
+            __DIR__ . '/../../_assets/keys/singleKeyDirectory'
         ));
 
         $gpg = self::createMock(GnuPG::class);
         $gpg->method('import')->will(self::returnValue(['imported' => 1]));
-        $gpg->method('verify')->will(self::returnValue([]));
+        $gpg->method('verify')->willReturn([['summary' => 0]]);
 
         $verify = new Verify($keys, $gpg);
 
         try {
             self::assertTrue($verify->fileWithSignature(
-                new SplFileInfo(__DIR__ . '/_assets/singleKeyDirectory/junitdiff.key'),
-                new SplFileInfo(__DIR__ . '/_assets/singleKeyDirectory/junitdiff.key')
+                new SplFileInfo(__DIR__ . '/../../_assets/keys/singleKeyDirectory/junitdiff.key'),
+                new SplFileInfo(__DIR__ . '/../../_assets/keys/singleKeyDirectory/junitdiff.key')
             ));
         } catch (Exception $e) {
             self::assertTrue(false);
         }
+    }
+
+    private function setupEmptyKeyDir(): string
+    {
+        $emptyKeyDir = sys_get_temp_dir() . '/cd-empty-key-dir';
+
+        if (!is_dir($emptyKeyDir)) {
+            mkdir($emptyKeyDir);
+        }
+        return $emptyKeyDir;
     }
 }

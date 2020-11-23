@@ -1,9 +1,4 @@
 <?php
-/**
- * Copyright by the ComposerDistributor-Team
- *
- * Licenses under the MIT-license. For details see the included file LICENSE.md
- */
 
 declare(strict_types=1);
 
@@ -13,6 +8,7 @@ use PharIo\ComposerDistributor\PackageVersion;
 
 final class VersionConstraintReplacer
 {
+    /** @var \PharIo\ComposerDistributor\PackageVersion  */
     private $versionConstraint;
 
     public function __construct(PackageVersion $versionConstraint)
@@ -23,12 +19,12 @@ final class VersionConstraintReplacer
     public function replace(string $string) : string
     {
         return str_replace([
-            '%minor%',
-            '%major%',
-            '%patch%',
-            '%release%',
-            '%build%',
-            '%version%',
+            '{{minor}}',
+            '{{major}}',
+            '{{patch}}',
+            '{{release}}',
+            '{{build}}',
+            '{{version}}',
         ], [
             $this->versionConstraint->minor(),
             $this->versionConstraint->major(),
