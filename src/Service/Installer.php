@@ -1,9 +1,4 @@
 <?php
-/**
- * Copyright by the ComposerDistributor-Team
- *
- * Licenses under the MIT-license. For details see the included file LICENSE.md
- */
 
 declare(strict_types=1);
 
@@ -63,7 +58,7 @@ final class Installer
 
         foreach ($fileList->getList() as $file) {
             $this->io->write(sprintf(
-                'downloading Artifact in version %2$s from %1$s',
+                '    Downloading artifact in version %2$s from %1$s',
                 $versionReplacer->replace($file->pharUrl()->toString()),
                 $packageVersion->fullVersion()
             ));
@@ -71,19 +66,18 @@ final class Installer
             $pharLocation = $this->downloadPhar($versionReplacer, $file);
 
             if (!$file->signatureUrl()) {
-                $this->io->write(sprintf(
-                    "No digital Signature found! Use this file with care!"
-                ));
+                $this->io->write('    No digital signature found! Use this file with care!');
                 continue;
             }
 
             $signatureLocation = $this->downloadSignature($versionReplacer, $file);
             $this->verifyPharWithSignature($pharLocation, $signatureLocation);
+            $this->io->write('    PHAR signature successfully verified');
             unlink($signatureLocation->getPathname());
         }
     }
 
-    private function downloadPhar(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
+    private function downloadPhar(VersionConstraintReplacer $versionReplacer, File $file): SplFileInfo
     {
         $binDir       = $this->event->getComposer()->getConfig()->get('bin-dir');
         $download     = new Download(Url::fromString(
@@ -102,7 +96,7 @@ final class Installer
         return $pharLocation;
     }
 
-    private function downloadSignature(VersionConstraintReplacer $versionReplacer, File $file): \SplFileInfo
+    private function downloadSignature(VersionConstraintReplacer $versionReplacer, File $file): SplFileInfo
     {
         $downloadSignature = new Download(Url::fromString(
             $versionReplacer->replace($file->signatureUrl()->toString())

@@ -1,17 +1,6 @@
 <?php
-/**
- * Copyright by the ComposerDistributor-Team
- *
- * Licenses under the MIT-license. For details see the included file LICENSE.md
- */
 
 declare(strict_types=1);
-
-/**
- * Copyright Andreas Heigl <andreas@heigl.org>
- *
- * Licenses under the MIT-license. For details see the included file LICENSE.md
- */
 
 namespace PharIo\ComposerDistributor;
 
@@ -29,10 +18,13 @@ use function version_compare;
 
 final class PackageVersion
 {
+    /** @var string */
     private $name;
 
+    /** @var string */
     private $versionString;
 
+    /** @var \PharIo\ComposerDistributor\SemanticVersion|null */
     private $semver;
 
     private function __construct(string $name, string $versionString)

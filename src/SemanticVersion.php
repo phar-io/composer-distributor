@@ -53,16 +53,16 @@ final class SemanticVersion
 
         $b = explode('.', $a[0]);
         if (!$b) {
-            throw NoSemanticVersioning::fromversionString($originalVersionString);
+            throw NoSemanticVersioning::fromVersionString($originalVersionString);
         }
 
         if (3 !== count($b)) {
-            throw NoSemanticVersioning::fromversionString($originalVersionString);
+            throw NoSemanticVersioning::fromVersionString($originalVersionString);
         }
 
         foreach ($b as $i) {
             if (!is_numeric($i)) {
-                throw NoSemanticVersioning::fromversionString($originalVersionString);
+                throw NoSemanticVersioning::fromVersionString($originalVersionString);
             }
         }
 
