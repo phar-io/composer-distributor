@@ -8,7 +8,7 @@ use PharIo\ComposerDistributor\PackageVersion;
 
 final class VersionConstraintReplacer
 {
-    /** @var \PharIo\ComposerDistributor\PackageVersion  */
+    /** @var \PharIo\ComposerDistributor\PackageVersion */
     private $versionConstraint;
 
     public function __construct(PackageVersion $versionConstraint)

@@ -1,9 +1,4 @@
 <?php
-/**
- * Copyright by the ComposerDistributor-Team
- *
- * Licenses under the MIT-license. For details see the included file LICENSE.md
- */
 
 declare(strict_types=1);
 
@@ -14,20 +9,28 @@ use function parse_url;
 
 final class Url
 {
+    /** @var string */
     private $scheme;
 
+    /** @var string */
     private $host;
 
+    /** @var int */
     private $port;
 
+    /** @var string */
     private $user;
 
+    /** @var string */
     private $password;
 
+    /** @var string */
     private $path;
 
+    /** @var string */
     private $query;
 
+    /** @var string */
     private $fragment;
 
     private function __construct(

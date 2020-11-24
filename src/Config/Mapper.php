@@ -8,7 +8,6 @@ use DOMDocument;
 use PharIo\ComposerDistributor\File;
 use PharIo\ComposerDistributor\FileList;
 use PharIo\ComposerDistributor\Url;
-use RuntimeException;
 
 class Mapper
 {
@@ -31,7 +30,6 @@ class Mapper
     {
         $original    = \libxml_use_internal_errors(true);
         $xsdFilename = __DIR__ . '/../../distributor.xsd';
-        $errors      = [];
 
         if ($this->document->schemaValidate($xsdFilename)) {
             return;
@@ -66,12 +64,12 @@ class Mapper
         return new FileList(...$phars);
     }
 
-    private function createKeyDir(): ?\SplFileInfo
+    private function createKeyDir(): ?string
     {
         $root = $this->document->documentElement;
 
         return $root->hasAttribute('keyDirectory')
-            ? new \SplFileInfo($root->getAttribute('keyDirectory'))
+            ? $root->getAttribute('keyDirectory')
             : null;
     }
 }

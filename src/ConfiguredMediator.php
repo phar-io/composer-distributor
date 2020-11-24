@@ -10,6 +10,7 @@ use Composer\IO\IOInterface;
 use PharIo\ComposerDistributor\Config\Config;
 use PharIo\ComposerDistributor\Config\Loader;
 use PharIo\ComposerDistributor\Service\Installer;
+use SplFileInfo;
 
 abstract class ConfiguredMediator extends PluginBase
 {
@@ -34,10 +35,25 @@ abstract class ConfiguredMediator extends PluginBase
     {
         return new Installer(
             $config->package(),
-            $config->keyDirectory() ? new KeyDirectory($config->keyDirectory()) : null,
+            $config->keyDirectory() ? $this->createKeyDirectory($config) : null,
             $this->io,
             $event
         );
+    }
+
+    private function createKeyDirectory(Config $config): KeyDirectory
+    {
+        $keyDirLocation = new SplFileInfo(
+            dirname($this->getDistributorConfig())
+            . DIRECTORY_SEPARATOR
+            . $config->keyDirectory()
+        );
+
+        if (!$keyDirLocation->isReadable()) {
+            throw KeyNotFound::fromInvalidPath($config->keyDirectory());
+        }
+
+        return new KeyDirectory($keyDirLocation);
     }
 
     private function removePhars(): void

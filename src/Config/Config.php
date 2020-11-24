@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace PharIo\ComposerDistributor\Config;
 
 use PharIo\ComposerDistributor\FileList;
+use RuntimeException;
 
 class Config
 {
     /** @var string */
     private $package;
 
-    /** @var \SplFileInfo|null */
+    /** @var string|null */
     private $keyDirectory;
 
     /** @var \PharIo\ComposerDistributor\FileList */
     private $phars;
 
-    public function __construct(string $package, FileList $phars, ?\SplFileInfo $keyDir = null)
+    public function __construct(string $package, FileList $phars, ?string $keyDir = null)
     {
         if (strpos($package, '/') === false) {
-            throw new \RuntimeException('Invalid package name');
+            throw new RuntimeException('Invalid package name');
         }
         $this->package      = $package;
         $this->phars        = $phars;
@@ -32,7 +33,7 @@ class Config
         return $this->package;
     }
 
-    public function keyDirectory(): ?\SplFileInfo
+    public function keyDirectory(): ?string
     {
         return $this->keyDirectory;
     }
