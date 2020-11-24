@@ -6,7 +6,6 @@ namespace PharIo\ComposerDistributorTest\Config;
 
 use PharIo\ComposerDistributor\Config\FileNotFound;
 use PharIo\ComposerDistributor\Config\InvalidXML;
-use PharIo\ComposerDistributor\Config\ValidationFailed;
 use PharIo\ComposerDistributor\Config\Loader;
 use PHPUnit\Framework\TestCase;
 
