@@ -14,6 +14,18 @@ use SplFileInfo;
 
 abstract class ConfiguredMediator extends PluginBase
 {
+    /** @var \PharIo\ComposerDistributor\Config\Config */
+    private $config;
+
+    /**
+     * Config has to be loaded on instantiation because on uninstall all external dependencies are
+     * removed before `uninstall` is called and auto-loading any external phar-io dependencies then will fail.
+     */
+    public function __construct()
+    {
+        $this->config = Loader::loadFile($this->getDistributorConfig());
+    }
+
     abstract protected function getDistributorConfig(): string;
 
     public function uninstall(Composer $composer, IOInterface $io)
@@ -25,10 +37,8 @@ abstract class ConfiguredMediator extends PluginBase
 
     public function installOrUpdateFunction(PackageEvent $event): void
     {
-        $config    = Loader::loadFile($this->getDistributorConfig());
-        $installer = $this->createInstallerFromConfig($config, $event);
-
-        $installer->install($config->phars());
+        $installer = $this->createInstallerFromConfig($this->config, $event);
+        $installer->install($this->config->phars());
     }
 
     private function createInstallerFromConfig(Config $config, PackageEvent $event): Installer
@@ -58,11 +68,9 @@ abstract class ConfiguredMediator extends PluginBase
 
     private function removePhars(): void
     {
-        $config = Loader::loadFile($this->getDistributorConfig());
         $binDir = $this->composer->getConfig()->get('bin-dir');
 
-        /** @var \PharIo\ComposerDistributor\File $phar */
-        foreach ($config->phars() as $phar) {
+        foreach ($this->config->phars()->getList() as $phar) {
             $this->deleteFile($phar, $binDir);
         }
     }
@@ -70,12 +78,15 @@ abstract class ConfiguredMediator extends PluginBase
     private function deleteFile(File $phar, string $binDir): void
     {
         $pharLocation = $binDir . DIRECTORY_SEPARATOR . $phar->pharName();
+
         if (is_file($pharLocation)) {
             if (!is_writable($pharLocation)) {
-                $this->io->write(sprintf('can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName()));
+                $this->io->write(
+                    sprintf('    Can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName())
+                );
                 return;
             }
-            $this->io->write(sprintf('remove phar \'%1$s\'', $phar->pharName()));
+            $this->io->write(sprintf('    Removing phar \'%1$s\'', $phar->pharName()));
             unlink($pharLocation);
         }
     }
