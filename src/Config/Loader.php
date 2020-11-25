@@ -3,7 +3,6 @@
 namespace PharIo\ComposerDistributor\Config;
 
 use DOMDocument;
-use RuntimeException;
 
 class Loader
 {

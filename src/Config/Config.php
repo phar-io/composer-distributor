@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PharIo\ComposerDistributor\Config;
 
 use PharIo\ComposerDistributor\FileList;
-use RuntimeException;
 
 class Config
 {
@@ -21,7 +20,7 @@ class Config
     public function __construct(string $package, FileList $phars, ?string $keyDir = null)
     {
         if (strpos($package, '/') === false) {
-            throw new RuntimeException('Invalid package name');
+            throw InvalidPackageName::fromString($package);
         }
         $this->package      = $package;
         $this->phars        = $phars;
