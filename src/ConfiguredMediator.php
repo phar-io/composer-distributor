@@ -82,11 +82,11 @@ abstract class ConfiguredMediator extends PluginBase
         if (is_file($pharLocation)) {
             if (!is_writable($pharLocation)) {
                 $this->io->write(
-                    sprintf('    Can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName())
+                    sprintf('  - Can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName())
                 );
                 return;
             }
-            $this->io->write(sprintf('    Removing phar \'%1$s\'', $phar->pharName()));
+            $this->io->write(sprintf('  - Removing phar \'%1$s\'', $phar->pharName()));
             unlink($pharLocation);
         }
     }

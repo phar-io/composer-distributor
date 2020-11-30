@@ -58,7 +58,7 @@ final class Installer
 
         foreach ($fileList->getList() as $file) {
             $this->io->write(sprintf(
-                '    Downloading artifact in version %2$s from %1$s',
+                '  - Downloading artifact in version %2$s from %1$s',
                 $versionReplacer->replace($file->pharUrl()->toString()),
                 $packageVersion->fullVersion()
             ));
@@ -66,13 +66,13 @@ final class Installer
             $pharLocation = $this->downloadPhar($versionReplacer, $file);
 
             if (!$file->signatureUrl()) {
-                $this->io->write('    No digital signature found! Use this file with care!');
+                $this->io->write('  - No digital signature found! Use this file with care!');
                 continue;
             }
 
             $signatureLocation = $this->downloadSignature($versionReplacer, $file);
             $this->verifyPharWithSignature($pharLocation, $signatureLocation);
-            $this->io->write('    PHAR signature successfully verified');
+            $this->io->write('  - PHAR signature successfully verified');
             unlink($signatureLocation->getPathname());
         }
     }
