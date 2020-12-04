@@ -1,5 +1,7 @@
 # Composer-Distributor
 
+![Build](https://github.com/phar-io/composer-distributor/workflows/Build/badge.svg)
+
 The base-code to create a ComposerPlugin that installs PHAR files
 instead of the whole source code of a project.
 

@@ -52,5 +52,6 @@
     <!--        <RawObjectIteration errorLevel="info" />-->
 
     <!--        <InvalidStringClass errorLevel="info" />-->
+      <RedundantCast errorLevel="info"/>
   </issueHandlers>
 </psalm>
