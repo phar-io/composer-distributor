@@ -22,11 +22,14 @@ jobs:
     runs-on: ubuntu-latest # ${{ matrix.operating-system }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
+      max-parallel: 2
       matrix:
         # operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        php-versions: ['7.3', '7.4', '8.0']
+        php-versions: ['7.3', '7.4']
         experimental: [false]
         include:
+          - php-versions: '8.0'
+            experimental: true
           - php-versions: '8.1'
             experimental: true
     name: PHP ${{ matrix.php-versions }} # Test on ${{ matrix.operating-system }}
