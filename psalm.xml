@@ -11,13 +11,8 @@
     <directory name="src"/>
     <ignoreFiles>
       <directory name="vendor"/>
-      <file name="src/autoload.php"/>
     </ignoreFiles>
   </projectFiles>
-
-  <stubs>
-    <file name="./build/phpstan/bootstrap.php"/>
-  </stubs>
 
   <issueHandlers>
     <LessSpecificReturnType errorLevel="info"/>

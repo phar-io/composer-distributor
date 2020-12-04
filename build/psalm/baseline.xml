@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="3.18.2@19aa905f7c3c7350569999a93c40ae91ae4e1626">
+  <file src="src/ConfiguredMediator.php">
+    <PossiblyNullArgument occurrences="1">
+      <code>$config-&gt;keyDirectory()</code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="src/IteratorImplementation.php">
+    <DocblockTypeContradiction occurrences="1">
+      <code>false === key($this-&gt;getList())</code>
+    </DocblockTypeContradiction>
+  </file>
+  <file src="src/PackageVersion.php">
+    <MissingPropertyType occurrences="3">
+      <code>$name</code>
+      <code>$semver</code>
+      <code>$versionString</code>
+    </MissingPropertyType>
+    <UndefinedInterfaceMethod occurrences="1">
+      <code>getReason</code>
+    </UndefinedInterfaceMethod>
+    <UndefinedMethod occurrences="2">
+      <code>getInstalledRepo</code>
+      <code>getJob</code>
+    </UndefinedMethod>
+  </file>
+  <file src="src/PluginBase.php">
+    <MissingPropertyType occurrences="2">
+      <code>$composer</code>
+      <code>$io</code>
+    </MissingPropertyType>
+    <MissingReturnType occurrences="3">
+      <code>activate</code>
+      <code>deactivate</code>
+      <code>uninstall</code>
+    </MissingReturnType>
+  </file>
+  <file src="src/SemanticVersion.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>$b</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="src/Service/Installer.php">
+    <PossiblyNullReference occurrences="1">
+      <code>toString</code>
+    </PossiblyNullReference>
+    <UndefinedClass occurrences="1">
+      <code>$factory-&gt;createGnuPG(new Directory(sys_get_temp_dir()))</code>
+    </UndefinedClass>
+  </file>
+  <file src="src/Service/Verify.php">
+    <UndefinedClass occurrences="1">
+      <code>GnuPG</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="2">
+      <code>$this-&gt;gpg</code>
+      <code>Gnupg</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/Url.php">
+    <TypeDoesNotContainType occurrences="2">
+      <code>$parts['port'] === ''</code>
+      <code>$parts['port'] === ''</code>
+    </TypeDoesNotContainType>
+  </file>
+</files>

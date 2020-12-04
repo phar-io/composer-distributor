@@ -23,6 +23,7 @@ class VerifyTest extends TestCase
 
     /**
      * @covers \PharIo\ComposerDistributor\Service\Verify::__construct
+     * @runInSeparateProcess
      */
     public function testThatConstructorThrowsWithoutKeys(): void
     {
@@ -43,6 +44,7 @@ class VerifyTest extends TestCase
 
     /**
      * @covers \PharIo\ComposerDistributor\Service\Verify::__construct
+     * @runInSeparateProcess
      */
     public function testThatConstructorWorksWithSingleKey(): void
     {
@@ -61,6 +63,7 @@ class VerifyTest extends TestCase
 
     /**
      * @covers \PharIo\ComposerDistributor\Service\Verify::__construct
+     * @runInSeparateProcess
      */
     public function testThatConstructorWorksWithAlreadyImportedKey(): void
     {
@@ -80,6 +83,7 @@ class VerifyTest extends TestCase
 
     /**
      * @covers \PharIo\ComposerDistributor\Service\Verify::fileWithSignature
+     * @runInSeparateProcess
      */
     public function testThatCorrectVerificationWillNotThrowAnException(): void
     {
