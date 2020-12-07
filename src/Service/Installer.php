@@ -6,8 +6,7 @@ namespace PharIo\ComposerDistributor\Service;
 
 use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
-use PharIo\FileSystem\Directory;
-use PharIo\GnuPG\Factory;
+use GnuPG;
 use PharIo\ComposerDistributor\SomebodyElsesProblem;
 use PharIo\ComposerDistributor\File;
 use PharIo\ComposerDistributor\FileList;
@@ -37,15 +36,17 @@ final class Installer
     /** @var \Composer\Installer\PackageEvent */
     private $event;
 
-    public function __construct(string $name, ?KeyDirectory $keys, IOInterface $io, PackageEvent $event)
+    /** @var \GnuPG|null */
+    private $gpg;
+
+    public function __construct(string $name, IOInterface $io, PackageEvent $event)
     {
         $this->name  = $name;
-        $this->keys  = $keys;
         $this->io    = $io;
         $this->event = $event;
     }
 
-    public function install(FileList $fileList) : void
+    public function install(FileList $fileList, ?KeyDirectory $keys, ?GnuPG $gnuPG) : void
     {
         try {
             $packageVersion = PackageVersion::fromPackageEvent($this->event, $this->name);
@@ -53,45 +54,57 @@ final class Installer
             $this->io->write($e->getMessage());
             return;
         }
-
+        $this->keys      = $keys;
+        $this->gpg       = $gnuPG;
         $versionReplacer = new VersionConstraintReplacer($packageVersion);
+        $binDir          = $this->event->getComposer()->getConfig()->get('bin-dir');
+
+        if (!file_exists($binDir)) {
+            mkdir($binDir, 0777, true);
+        }
 
         foreach ($fileList->getList() as $file) {
             $this->io->write(sprintf(
-                '  - Downloading artifact in version %2$s from %1$s',
-                $versionReplacer->replace($file->pharUrl()->toString()),
-                $packageVersion->fullVersion()
+                '  - Downloading artifact from %1$s',
+                $versionReplacer->replace($file->pharUrl()->toString())
             ));
 
-            $pharLocation = $this->downloadPhar($versionReplacer, $file);
+            $downloadLocation = $this->downloadAndVerify($versionReplacer, $file);
+            $installLocation  = new SplFileInfo($binDir . DIRECTORY_SEPARATOR . $file->pharName());
 
-            if (!$file->signatureUrl()) {
-                $this->io->write('  - No digital signature found! Use this file with care!');
-                continue;
-            }
-
-            $signatureLocation = $this->downloadSignature($versionReplacer, $file);
-            $this->verifyPharWithSignature($pharLocation, $signatureLocation);
-            $this->io->write('  - PHAR signature successfully verified');
-            unlink($signatureLocation->getPathname());
+            rename($downloadLocation->getPathname(), $installLocation->getPathname());
+            chmod($installLocation->getPathname(), 0755);
         }
+    }
+
+    private function downloadAndVerify(VersionConstraintReplacer $versionReplacer, File $file): SplFileInfo
+    {
+        $pharLocation = $this->downloadPhar($versionReplacer, $file);
+
+        if (!$file->signatureUrl()) {
+            $this->io->write('  - <comment>No digital signature found! Use this file with care!</comment>');
+            return $pharLocation;
+        }
+
+        if (null === $this->gpg) {
+            $this->io->write('  - <comment>No GnuPG found to verify signature! Use this file with care!</comment>');
+            return $pharLocation;
+        }
+
+        $signatureLocation = $this->downloadSignature($versionReplacer, $file);
+        $this->verifyPharWithSignature($pharLocation, $signatureLocation);
+        $this->io->write('  - PHAR signature successfully verified');
+        unlink($signatureLocation->getPathname());
+
+        return $pharLocation;
     }
 
     private function downloadPhar(VersionConstraintReplacer $versionReplacer, File $file): SplFileInfo
     {
-        $binDir       = $this->event->getComposer()->getConfig()->get('bin-dir');
-        $download     = new Download(Url::fromString(
-            $versionReplacer->replace($file->pharUrl()->toString())
-        ));
-        $pharLocation = new SplFileInfo(
-            $binDir . DIRECTORY_SEPARATOR . $file->pharName()
-        );
+        $download     = new Download(Url::fromString($versionReplacer->replace($file->pharUrl()->toString())));
+        $pharLocation = new SplFileInfo(sys_get_temp_dir() . '/' . $file->pharName());
 
-        if (! file_exists($binDir)) {
-            mkdir($binDir, 0777, true);
-        }
         $download->toLocation($pharLocation);
-        chmod($pharLocation->getRealPath(), 0755);
 
         return $pharLocation;
     }
@@ -112,11 +125,8 @@ final class Installer
         if (null === $this->keys) {
             throw new RuntimeException('No keys to verify the signature');
         }
-        $factory = new Factory();
-        $verify  = new Verify(
-            $this->keys,
-            $factory->createGnuPG(new Directory(sys_get_temp_dir()))
-        );
+
+        $verify  = new Verify($this->keys, $this->gpg);
 
         if (!$verify->fileWithSignature($pharLocation, $signatureLocation)) {
             throw new RuntimeException('Signature Verification failed');
