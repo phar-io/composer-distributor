@@ -86,7 +86,7 @@ final class Installer
             return $pharLocation;
         }
 
-        if (null === $this->gpg) {
+        if ($this->gpg === null) {
             $this->io->write('  - <comment>No GnuPG found to verify signature! Use this file with care!</comment>');
             return $pharLocation;
         }
@@ -122,7 +122,7 @@ final class Installer
 
     private function verifyPharWithSignature(SplFileInfo $pharLocation, SplFileInfo $signatureLocation): void
     {
-        if (null === $this->keys) {
+        if ($this->keys === null) {
             throw new RuntimeException('No keys to verify the signature');
         }
 

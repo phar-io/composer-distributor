@@ -21,9 +21,6 @@ abstract class ConfiguredMediator extends PluginBase
     /** @var \PharIo\ComposerDistributor\Config\Config */
     private $config;
 
-    /** @var bool  */
-    private static $warningDisplayed = false;
-
     /**
      * Config has to be loaded on instantiation because on uninstall all external dependencies are
      * removed before `uninstall` is called and auto-loading any external phar-io dependencies then will fail.
@@ -47,7 +44,7 @@ abstract class ConfiguredMediator extends PluginBase
         $gnuPG = $this->createGnuPG();
         // we do not want to crash if no GnuPG was found
         // but display a noticeable warning to the user
-        if (null === $gnuPG && !self::$warningDisplayed) {
+        if ($gnuPG === null) {
             $this->io->write(
                 PHP_EOL .
                 '    <warning>WARNING</warning>' . PHP_EOL .
@@ -55,7 +52,6 @@ abstract class ConfiguredMediator extends PluginBase
                 '    Consider installing GnuPG to verify PHAR authenticity.' . PHP_EOL .
                 '    If you need help installing GnuPG visit http://phar.io/install-gnupg' . PHP_EOL
             );
-            self::$warningDisplayed = true;
         }
 
         $installer = $this->createInstallerFromConfig($this->config, $event);
