@@ -34,8 +34,7 @@ abstract class ConfiguredMediator extends PluginBase
 
     public function uninstall(Composer $composer, IOInterface $io)
     {
-        $this->composer = $composer;
-        $this->io       = $io;
+        parent::uninstall($composer, $io);
         $this->removePhars();
     }
 
@@ -45,7 +44,7 @@ abstract class ConfiguredMediator extends PluginBase
         // we do not want to crash if no GnuPG was found
         // but display a noticeable warning to the user
         if ($gnuPG === null) {
-            $this->io->write(
+            $this->getIO()->write(
                 PHP_EOL .
                 '    <warning>WARNING</warning>' . PHP_EOL .
                 '    No GPG installation found! Use installed PHARs with care. ' . PHP_EOL .
@@ -77,7 +76,7 @@ abstract class ConfiguredMediator extends PluginBase
     {
         return new Installer(
             $config->package(),
-            $this->io,
+            $this->getIO(),
             $event
         );
     }
@@ -99,7 +98,7 @@ abstract class ConfiguredMediator extends PluginBase
 
     private function removePhars(): void
     {
-        $binDir = $this->composer->getConfig()->get('bin-dir');
+        $binDir = $this->getComposer()->getConfig()->get('bin-dir');
 
         foreach ($this->config->phars()->getList() as $phar) {
             $this->deleteFile($phar, $binDir);
@@ -112,12 +111,12 @@ abstract class ConfiguredMediator extends PluginBase
 
         if (is_file($pharLocation)) {
             if (!is_writable($pharLocation)) {
-                $this->io->write(
+                $this->getIO()->write(
                     sprintf('  - Can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName())
                 );
                 return;
             }
-            $this->io->write(sprintf('  - Removing phar <info>%1$s</info>', $phar->pharName()));
+            $this->getIO()->write(sprintf('  - Removing phar <info>%1$s</info>', $phar->pharName()));
             unlink($pharLocation);
         }
     }

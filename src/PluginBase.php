@@ -15,10 +15,12 @@ use PharIo\ComposerDistributor\Service\Installer;
 abstract class PluginBase implements PluginInterface, EventSubscriberInterface
 {
     /** @var \Composer\Composer */
-    protected $composer;
+    private $composer;
 
     /** @var \Composer\IO\IOInterface */
-    protected $io;
+    private $io;
+
+    abstract public function installOrUpdateFunction(PackageEvent $event) : void;
 
     public function activate(Composer $composer, IOInterface $io)
     {
@@ -59,5 +61,19 @@ abstract class PluginBase implements PluginInterface, EventSubscriberInterface
         );
     }
 
-    abstract public function installOrUpdateFunction(PackageEvent $event) : void;
+    protected function getIO(): IOInterface
+    {
+        if (!$this->io) {
+            throw new \RuntimeException('IO not set');
+        }
+        return $this->io;
+    }
+
+    protected function getComposer(): Composer
+    {
+        if (!$this->composer) {
+            throw new \RuntimeException('Composer not set');
+        }
+        return $this->composer;
+    }
 }
