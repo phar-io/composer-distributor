@@ -7,9 +7,13 @@ namespace PharIo\ComposerDistributor;
 use Composer\Composer;
 use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
+use Exception;
+use GnuPG;
 use PharIo\ComposerDistributor\Config\Config;
 use PharIo\ComposerDistributor\Config\Loader;
 use PharIo\ComposerDistributor\Service\Installer;
+use PharIo\FileSystem\Directory;
+use PharIo\GnuPG\Factory;
 use SplFileInfo;
 
 abstract class ConfiguredMediator extends PluginBase
@@ -30,23 +34,49 @@ abstract class ConfiguredMediator extends PluginBase
 
     public function uninstall(Composer $composer, IOInterface $io)
     {
-        $this->composer = $composer;
-        $this->io       = $io;
+        parent::uninstall($composer, $io);
         $this->removePhars();
     }
 
     public function installOrUpdateFunction(PackageEvent $event): void
     {
+        $gnuPG = $this->createGnuPG();
+        // we do not want to crash if no GnuPG was found
+        // but display a noticeable warning to the user
+        if ($gnuPG === null) {
+            $this->getIO()->write(
+                PHP_EOL .
+                '    <warning>WARNING</warning>' . PHP_EOL .
+                '    No GPG installation found! Use installed PHARs with care. ' . PHP_EOL .
+                '    Consider installing GnuPG to verify PHAR authenticity.' . PHP_EOL .
+                '    If you need help installing GnuPG visit http://phar.io/install-gnupg' . PHP_EOL
+            );
+        }
+
         $installer = $this->createInstallerFromConfig($this->config, $event);
-        $installer->install($this->config->phars());
+        $installer->install(
+            $this->config->phars(),
+            $this->config->keyDirectory() ? $this->createKeyDirectory($this->config) : null,
+            $gnuPG
+        );
+    }
+
+    public function createGnuPG(): ?GnuPG
+    {
+        $factory = new Factory();
+        try {
+            $gnuPG = $factory->createGnuPG(new Directory(sys_get_temp_dir()));
+        } catch (Exception $e) {
+            $gnuPG = null;
+        }
+        return $gnuPG;
     }
 
     private function createInstallerFromConfig(Config $config, PackageEvent $event): Installer
     {
         return new Installer(
             $config->package(),
-            $config->keyDirectory() ? $this->createKeyDirectory($config) : null,
-            $this->io,
+            $this->getIO(),
             $event
         );
     }
@@ -68,7 +98,7 @@ abstract class ConfiguredMediator extends PluginBase
 
     private function removePhars(): void
     {
-        $binDir = $this->composer->getConfig()->get('bin-dir');
+        $binDir = $this->getComposer()->getConfig()->get('bin-dir');
 
         foreach ($this->config->phars()->getList() as $phar) {
             $this->deleteFile($phar, $binDir);
@@ -81,12 +111,12 @@ abstract class ConfiguredMediator extends PluginBase
 
         if (is_file($pharLocation)) {
             if (!is_writable($pharLocation)) {
-                $this->io->write(
+                $this->getIO()->write(
                     sprintf('  - Can not remove phar \'%1$s\' (insufficient permissions)', $phar->pharName())
                 );
                 return;
             }
-            $this->io->write(sprintf('  - Removing phar \'%1$s\'', $phar->pharName()));
+            $this->getIO()->write(sprintf('  - Removing phar <info>%1$s</info>', $phar->pharName()));
             unlink($pharLocation);
         }
     }
