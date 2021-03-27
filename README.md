@@ -30,12 +30,12 @@ Just change the `packageName` and `<phar>` configuration and you are good to go.
 <distributor xmlns="https://phar.io/composer-distributor"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="https://phar.io/xml/distributor/1.0/schema.xsd"
-packageName="your/captainhook"
+packageName="yournamespace/pluginname"
 keyDirectory="keys">
 
-<phar name="captainhook"
-file="https://github.com/captainhookphp/captainhook/releases/download/{{version}}/captainhook.phar"
-signature="https://github.com/captainhookphp/captainhook/releases/download/{{version}}/captainhook.phar.asc"/>
+<phar name="pharname"
+file="https://github.com/yournamespace/pluginname/releases/download/{{version}}/pharname.phar"
+signature="https://github.com/yournamespace/pluginname/releases/download/{{version}}/pharname.phar.asc"/>
 
 </distributor>
 ```
