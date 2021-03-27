@@ -11,13 +11,16 @@ use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use PharIo\ComposerDistributor\Service\Installer;
-use SplFileInfo;
 
 abstract class PluginBase implements PluginInterface, EventSubscriberInterface
 {
-    protected $composer;
+    /** @var \Composer\Composer */
+    private $composer;
 
-    protected $io;
+    /** @var \Composer\IO\IOInterface */
+    private $io;
+
+    abstract public function installOrUpdateFunction(PackageEvent $event) : void;
 
     /**
      * @param Composer $composer
@@ -27,7 +30,7 @@ abstract class PluginBase implements PluginInterface, EventSubscriberInterface
     public function activate(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
-        $this->io = $io;
+        $this->io       = $io;
     }
 
     /**
@@ -38,7 +41,7 @@ abstract class PluginBase implements PluginInterface, EventSubscriberInterface
     public function deactivate(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
-        $this->io = $io;
+        $this->io       = $io;
     }
 
     /**
@@ -49,7 +52,7 @@ abstract class PluginBase implements PluginInterface, EventSubscriberInterface
     public function uninstall(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
-        $this->io = $io;
+        $this->io       = $io;
     }
 
     public static function getSubscribedEvents()
@@ -58,21 +61,34 @@ abstract class PluginBase implements PluginInterface, EventSubscriberInterface
             PackageEvents::POST_PACKAGE_INSTALL => [
                 ['installOrUpdateFunction', 0],
             ],
-            PackageEvents::POST_PACKAGE_UPDATE => [
+            PackageEvents::POST_PACKAGE_UPDATE  => [
                 ['installOrUpdateFunction', 0],
             ],
         ];
     }
 
-    public function createInstaller(string $pluginName, string $keyDirectory, PackageEvent $event) : Installer
+    public function createInstaller(string $pluginName, PackageEvent $event) : Installer
     {
         return new Installer(
             $pluginName,
-            new KeyDirectory(new SplFileInfo($keyDirectory)),
             $this->io,
             $event
         );
     }
 
-    abstract public function installOrUpdateFunction(PackageEvent $event) : void;
+    protected function getIO(): IOInterface
+    {
+        if (!$this->io) {
+            throw new \RuntimeException('IO not set');
+        }
+        return $this->io;
+    }
+
+    protected function getComposer(): Composer
+    {
+        if (!$this->composer) {
+            throw new \RuntimeException('Composer not set');
+        }
+        return $this->composer;
+    }
 }

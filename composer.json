@@ -8,6 +8,16 @@
       "name": "Andreas Heigl",
       "email": "andreas@heigl.org",
       "role": "Developer"
+    },
+    {
+      "name" : "Arne Blankerts",
+      "email" : "arne@blankerts.de",
+      "role" : "Developer"
+    },
+    {
+      "name" : "Sebastian Feldmann",
+      "email" : "sf@sebastian-feldmann.info",
+      "role" : "Developer"
     }
   ],
   "keywords": [
@@ -43,8 +53,8 @@
     "ext-dom": "*",
     "ext-libxml": "*",
     "composer-plugin-api": "^1.1 || ^2.0",
-    "phar-io/gnupg": "^0.9",
-    "phar-io/filesystem": "^0.9"
+    "phar-io/gnupg": "^1.0",
+    "phar-io/filesystem": "^2.0"
   },
   "require-dev": {
     "composer/composer": "^2.0"
