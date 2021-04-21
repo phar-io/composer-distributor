@@ -76,4 +76,11 @@ abstract class PluginBase implements PluginInterface, EventSubscriberInterface
         }
         return $this->composer;
     }
+
+    protected function isDesiredPackageEvent(PackageEvent $event, string $pluginName): bool
+    {
+        $package = OperationPackage::createFromEvent($event, $pluginName);
+
+        return $package->getName() === $pluginName;
+    }
 }

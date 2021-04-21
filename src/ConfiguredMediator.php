@@ -40,6 +40,9 @@ abstract class ConfiguredMediator extends PluginBase
 
     public function installOrUpdateFunction(PackageEvent $event): void
     {
+        if (!$this->isDesiredPackageEvent($event, $this->config->package())) {
+            return;
+        }
         $gnuPG = $this->createGnuPG();
         // we do not want to crash if no GnuPG was found
         // but display a noticeable warning to the user
