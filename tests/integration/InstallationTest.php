@@ -17,7 +17,6 @@ use function file_exists;
 use function getenv;
 use function sys_get_temp_dir;
 use function unlink;
-use function var_dump;
 
 class InstallationTest extends TestCase
 {
@@ -122,6 +121,7 @@ class InstallationTest extends TestCase
         parent::setUp();
 
         $gpgHome = getenv('GNUPGHOME');
+        $gpgHome = sys_get_temp_dir();
 
         if (file_exists($gpgHome . '/trustdb.gpg')) {
             unlink($gpgHome . '/trustdb.gpg');

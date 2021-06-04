@@ -11,7 +11,7 @@ final class InvalidXML extends RuntimeException
     /**
      * @param \LibXMLError[] $errors
      */
-    public static function fromXMLErrors(array $errors): InvalidXml
+    public static function fromXMLErrors(array $errors): self
     {
         $message = 'Error loading config file' . PHP_EOL;
 
