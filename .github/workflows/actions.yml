@@ -1,0 +1,94 @@
+name: Build
+on: [push]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Check CodingStyle
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: phive
+      - name: Install CS-Fixer
+        run: phive install --trust-gpg-keys E82B2FB314E9906E php-cs-fixer
+      - name: Run CS-Check
+        run: composer fix-dry
+  test:
+    needs: check
+    runs-on: ubuntu-latest # ${{ matrix.operating-system }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      max-parallel: 2
+      matrix:
+        # operating-system: [ubuntu-latest, windows-latest, macos-latest]
+        php-versions: ['7.3', '7.4']
+        experimental: [false]
+        include:
+          - php-versions: '8.0'
+            experimental: true
+          - php-versions: '8.1'
+            experimental: true
+    name: PHP ${{ matrix.php-versions }} # Test on ${{ matrix.operating-system }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: sodium
+          tools: phive
+      - name: prepare
+        run: composer update
+      - name: Download phpunit
+        run: phive --no-progress install --trust-gpg-keys 4AA394086372C20A phpunit
+      - name: test
+        run: composer test
+  analyze:
+    #needs: test
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: phive
+      - name: Download psalm
+        run: phive --no-progress install --trust-gpg-keys 8A03EA3B385DBAA1 psalm
+      - name: install
+        run: composer update
+      - name: analyze
+        run: ./tools/psalm
+  coverage:
+  #  needs: test
+  #  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          coverage: xdebug
+          tools: phive
+      - name: Download phpunit
+        run: phive --no-progress install --trust-gpg-keys 4AA394086372C20A phpunit
+      - name: Install
+        run: composer update
+      - name: run testsuite
+        run: composer test-coverage
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require php-coveralls/php-coveralls
+          php-coveralls --coverage_clover=clover.xml -v

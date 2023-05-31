@@ -1,5 +1,8 @@
 # Deploying PHAR files via Composer
 
+![Build](https://github.com/phar-io/composer-distributor/workflows/Build/badge.svg)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phar-io/composer-distributor/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/phar-io/composer-distributor/?branch=main)
+
 If you have a tool that behaves like a binary and want to distribute this tool as a
 PHAR file instead of the source-code but don't want to give up the convenience
 to install your tool via Composer you can use this library to create a Composer-Plugin
